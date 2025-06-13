@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AL_MINHDANG_ICHECK</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <h1>AI AUDIO-TEXT</h1>
+
+        <form id="upload-form">
+            <label for="audio-file" id="file-label">
+                <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
+                <p>Kéo hoặc tải filevào đây</p>
+                <span id="file-name"></span>
+            </label>
+            <input type="file" name="audio_file" id="audio-file" accept="audio/*" required style="display:none;">
+            <button type="submit" id="submit-btn">Phân tích</button>
+        </form>
+
+        <p id="status"></p>
+        <pre id="result-container" style="display:none;"></pre>
+    </div>
+
+    <script>
+        const form = document.getElementById('upload-form');
+        const fileInput = document.getElementById('audio-file');
+        const fileLabel = document.getElementById('file-label');
+        const fileNameSpan = document.getElementById('file-name');
+        const statusElement = document.getElementById('status');
+        const resultContainer = document.getElementById('result-container');
+        const submitBtn = document.getElementById('submit-btn');
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileNameSpan.textContent = `File đã chọn: ${fileInput.files[0].name}`;
+            } else {
+                fileNameSpan.textContent = '';
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData();
+            formData.append("audio_file", fileInput.files[0]);
+
+            submitBtn.disabled = true;
+            statusElement.textContent = 'Đang tải file lên và xử lý...';
+            resultContainer.style.display = 'none';
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    resultContainer.textContent = result.report;
+                    resultContainer.style.display = 'block';
+                    statusElement.textContent = 'Phân tích hoàn tất!';
+                } else {
+                    throw new Error(result.detail || 'Lỗi không xác định từ server.');
+                }
+
+            } catch (error) {
+                statusElement.textContent = `Lỗi: ${error.message}`;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
