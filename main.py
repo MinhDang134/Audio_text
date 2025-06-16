@@ -1,8 +1,8 @@
 import os
 import shutil
-import requests  # Thêm import
+import requests
 import google.generativeai as genai
-from fastapi import FastAPI, File, UploadFile, Request, HTTPException, BackgroundTasks  # Thêm BackgroundTasks
+from fastapi import FastAPI, File, UploadFile, Request, HTTPException, BackgroundTasks
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -55,6 +55,8 @@ async def read_root(request: Request):
 async def analyze_audio(background_tasks: BackgroundTasks, audio_file: UploadFile = File(...)):
     if model is None:
         raise HTTPException(status_code=500, detail="Mô hình AI chưa được khởi tạo.")
+    if not audio_file :
+        raise HTTPException(status_code=500,detail="không có video mp3 ")
     temp_file_path = f"temp_{audio_file.filename}"
     try:
         with open(temp_file_path, "wb") as buffer:
