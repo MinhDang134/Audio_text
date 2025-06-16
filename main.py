@@ -2,7 +2,7 @@ import os
 import shutil
 import requests
 import google.generativeai as genai
-from fastapi import FastAPI, File, UploadFile, Request, HTTPException, BackgroundTasks
+from fastapi import FastAPI, File, UploadFile, Request, HTTPException, BackgroundTasks, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -20,10 +20,13 @@ try:
         raise ValueError("Không tìm thấy GOOGLE_API_KEY trong file .env")
     genai.configure(api_key=GOOGLE_API_KEY)
     model = genai.GenerativeModel(model_name="gemini-1.5-flash")
+    model_hai = genai.GenerativeModel(model_name="gemini-2.0-flash")
+
     print("Đã cấu hình Google API thành công.")
 except Exception as e:
     print(f"lỗi cấu hình như sau : {e}")
     model = None
+    model_hai = None
 
 
 prompt_instructions = "*câu hỏi 1 :* viết chi tiết toàn bộ cuộc hội thoại ra , chia ra người khách hàng là speaker 1 , còn nhân viên chăm sóc khách hàng là speaker 2  "
@@ -49,22 +52,30 @@ async def read_root(request: Request):
 
 
 @app.post("/analyze")
-async def analyze_audio(background_tasks: BackgroundTasks, audio_file: UploadFile = File(...)):
+async def analyze_audio(background_tasks: BackgroundTasks,ai_model: str = Form(...), audio_file: UploadFile = File(...)):
     if model is None:
         raise HTTPException(status_code=500, detail="Mô hình AI chưa được khởi tạo.")
     if not audio_file :
         raise HTTPException(status_code=500,detail="không có video mp3 ")
+    if not ai_model:
+        raise HTTPException(status_code=500,detail="không có option nào được chọn ")
     temp_file_path = f"temp_{audio_file.filename}"
     try:
         with open(temp_file_path, "wb") as buffer:
             shutil.copyfileobj(audio_file.file, buffer)
         gemini_file = genai.upload_file(path=temp_file_path)
-        response = model.generate_content([gemini_file, prompt_instructions])
+        if ai_model == "model_b":
+           response = model_hai.generate_content([gemini_file, prompt_instructions])
+        elif ai_model == "model_a":
+            response = model.generate_content([gemini_file, prompt_instructions])
+        else:
+            raise HTTPException(status_code=500,detail="Chương trình lỗi rồi ")
         report_text = response.text
         print("--- Phân tích hoàn tất! Bắt đầu gửi webhook trong nền ---")
         webhook_payload = {
             "source_file": audio_file.filename,
-            "report": report_text
+            "report": report_text,
+            "model al": ai_model
         }
         background_tasks.add_task(send_to_webhook, webhook_payload)
         return {"report": report_text}

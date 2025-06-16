@@ -22,9 +22,8 @@
             <div class="model-selection">
                 <label for="ai-model">Chọn Mô hình AI:</label>
                 <select name="ai_model" id="ai-model">
-                    <option value="model_a">Mô hình A (Whisper Small)</option>
-                    <option value="model_b">Mô hình B (Whisper Base)</option>
-                    <option value="model_c">Mô hình C (Whisper Medium)</option>
+                    <option value="model_a">Gemini 1.5</option>
+                    <option value="model_b">Gemini 2.0 (Flash)</option>
                     </select>
             </div>
             <button type="submit" id="submit-btn">Phân tích</button>
@@ -42,7 +41,8 @@
         const statusElement = document.getElementById('status');
         const resultContainer = document.getElementById('result-container');
         const submitBtn = document.getElementById('submit-btn');
-        const aiModelSelect = document.getElementById('ai-model'); // Lấy element select
+        const aiModelSelect = document.getElementById('ai-model');
+
 
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) {
