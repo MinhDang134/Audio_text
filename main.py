@@ -13,7 +13,6 @@ load_dotenv()
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
-
 try:
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
     WEBHOOK_URL = os.getenv("WEBHOOK_URL")
@@ -23,21 +22,19 @@ try:
     model = genai.GenerativeModel(model_name="gemini-1.5-flash")
     print("Đã cấu hình Google API thành công.")
 except Exception as e:
-    print(f"LỖI CẤU HÌNH: {e}")
+    print(f"lỗi cấu hình như sau : {e}")
     model = None
 
 
-prompt_instructions = "*câu hỏi 1 :* viết chi tiết toàn bộ cuộc hội thoại ra  "
+prompt_instructions = "*câu hỏi 1 :* viết chi tiết toàn bộ cuộc hội thoại ra , chia ra người khách hàng là speaker 1 , còn nhân viên chăm sóc khách hàng là speaker 2  "
 
 
 
 def send_to_webhook(payload: dict):
-
     try:
         if not WEBHOOK_URL:
             print("Chưa cấu hình WEBHOOK_URL, bỏ qua việc gửi.")
             return
-
         print(f"Đang gửi kết quả đến webhook: {WEBHOOK_URL}")
         response = requests.post(WEBHOOK_URL, json=payload, timeout=10)
         response.raise_for_status()

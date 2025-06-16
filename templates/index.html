@@ -9,15 +9,24 @@
 </head>
 <body>
     <div class="app-container">
-        <h1>AI AUDIO-TEXT</h1>
+        <h1>MinhDang_chill</h1>
 
         <form id="upload-form">
             <label for="audio-file" id="file-label">
                 <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                <p>Kéo hoặc tải filevào đây</p>
+                <p>Kéo hoặc tải file vào đây</p>
                 <span id="file-name"></span>
             </label>
             <input type="file" name="audio_file" id="audio-file" accept="audio/*" required style="display:none;">
+
+            <div class="model-selection">
+                <label for="ai-model">Chọn Mô hình AI:</label>
+                <select name="ai_model" id="ai-model">
+                    <option value="model_a">Mô hình A (Whisper Small)</option>
+                    <option value="model_b">Mô hình B (Whisper Base)</option>
+                    <option value="model_c">Mô hình C (Whisper Medium)</option>
+                    </select>
+            </div>
             <button type="submit" id="submit-btn">Phân tích</button>
         </form>
 
@@ -33,6 +42,7 @@
         const statusElement = document.getElementById('status');
         const resultContainer = document.getElementById('result-container');
         const submitBtn = document.getElementById('submit-btn');
+        const aiModelSelect = document.getElementById('ai-model'); // Lấy element select
 
         fileInput.addEventListener('change', () => {
             if (fileInput.files.length > 0) {
@@ -47,6 +57,7 @@
 
             const formData = new FormData();
             formData.append("audio_file", fileInput.files[0]);
+            formData.append("ai_model", aiModelSelect.value);
 
             submitBtn.disabled = true;
             statusElement.textContent = 'Đang tải file lên và xử lý...';
