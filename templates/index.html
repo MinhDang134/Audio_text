@@ -19,6 +19,11 @@
             </label>
             <input type="file" name="audio_file" id="audio-file" accept="audio/*" required style="display:none;">
 
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Tìm kiếm job_id...">
+                <button type="button" id="search-button"><i class="fas fa-search"></i></button>
+            </div>
+
             <div class="model-selection">
                 <label for="ai-model">Chọn Mô hình AI:</label>
                 <select name="ai_model" id="ai-model">
@@ -42,6 +47,8 @@
         const resultContainer = document.getElementById('result-container');
         const submitBtn = document.getElementById('submit-btn');
         const aiModelSelect = document.getElementById('ai-model');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
 
 
         fileInput.addEventListener('change', () => {
@@ -51,6 +58,24 @@
                 fileNameSpan.textContent = '';
             }
         });
+
+
+        searchButton.addEventListener('click', () => {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+                alert(`Bạn đang tìm kiếm: ${searchTerm}`);
+            } else {
+                alert('Vui lòng nhập từ khóa để tìm kiếm.');
+            }
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchButton.click();
+            }
+        });
+
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
