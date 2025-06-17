@@ -2,10 +2,10 @@ import logging
 import os
 from contextlib import contextmanager
 from typing import Generator, Optional
-
+from dotenv import load_dotenv
 from sqlalchemy.engine import Engine
 from sqlmodel import create_engine, Session
-
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

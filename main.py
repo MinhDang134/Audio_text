@@ -7,7 +7,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
+from sqlalchemy import select
 import uuid
+
+from sqlmodel import SQLModel
+
 from audio.database import get_session, engine
 from audio.models import audiot
 
@@ -102,7 +106,7 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
         report_text = response.text
 
 
-        analysis_jobs[str(job_id)]["status"] = "ANALYSIS_COMPLETE"
+        analysis_jobs[str(job_id)]["status"] = "Thành Công"
         analysis_jobs[str(job_id)]["report"] = report_text
 
 
@@ -110,6 +114,7 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
             with get_session() as session:
                 analysis_result = audiot(
                     job_id=job_id,
+                    status = analysis_jobs[str(job_id)]["status"],
                     source_file=audio_file.filename,
                     report=report_text,
                     model_ai=ai_model
@@ -124,6 +129,7 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
         webhook_payload = {
             "job_id": str(job_id),
             "source_file": audio_file.filename,
+            "status" : analysis_jobs[str(job_id)]["status"],
             "report": report_text,
             "model_ai": ai_model
         }
@@ -134,7 +140,16 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
 
     except Exception as e:
         print(f"[{job_id}] Lỗi xử lý: {e}")
-        analysis_jobs[str(job_id)] = {"status": "FAILED", "error": str(e)}
+        analysis_jobs[str(job_id)] = {"status": "Không thành công", "error": str(e)}
+        with get_session() as session:
+            analysis_result = audiot(
+                job_id=job_id,
+                status=analysis_jobs[str(job_id)]["status"],
+                source_file=audio_file.filename,
+                report= " ",
+                model_ai=ai_model
+            )
+            session.add(analysis_result)
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if os.path.exists(temp_file_path):
@@ -142,10 +157,17 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
         await audio_file.close()
 
 
+
 @app.get("/status/{job_id}")
 async def get_job_status(job_id: str):
-    status_info = analysis_jobs.get(job_id)
-    print(f"Có trạng thái {status_info} cho job_id {job_id}")  # Log rõ hơn
-    if not status_info:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job_id này.")
-    return status_info
+    query = select(audiot).where(audiot.job_id == job_id)
+    with get_session() as session:
+        db_result = session.exec(query).one_or_none()
+
+    if db_result:
+        print(f"Tìm thấy job_id : {job_id} trong database")
+        print(f"Đối tượng db_result: {db_result}") # Thêm dòng này để kiểm tra
+        return db_result.model_dump()
+    else:
+        print(f"Không tìm thấy dữ liệu của job_id này: {job_id}")
+        raise HTTPException(status_code=404, detail=f"Không tìm thấy job_id: {job_id}")
