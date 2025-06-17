@@ -159,15 +159,19 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
 
 
 @app.get("/status/{job_id}")
-async def get_job_status(job_id: str):
+def get_job_status(job_id: str):
     query = select(audiot).where(audiot.job_id == job_id)
     with get_session() as session:
-        db_result = session.exec(query).one_or_none()
-
-    if db_result:
-        print(f"Tìm thấy job_id : {job_id} trong database")
-        print(f"Đối tượng db_result: {db_result}") # Thêm dòng này để kiểm tra
-        return db_result.model_dump()
-    else:
-        print(f"Không tìm thấy dữ liệu của job_id này: {job_id}")
-        raise HTTPException(status_code=404, detail=f"Không tìm thấy job_id: {job_id}")
+        result = session.execute(query).first()
+        if result:
+            for row in result:
+                ketqua ={
+                    "job_id": row.job_id,
+                    "source_file": row.source_file,
+                    "status": row.status,
+                    "report": row.report,
+                    "model_ai": row.model_ai
+                }
+                return ketqua
+        else:
+            raise HTTPException(status_code=404, detail=f"Không tìm thấy job_id: {job_id}")
