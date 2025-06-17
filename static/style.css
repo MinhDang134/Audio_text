@@ -202,7 +202,7 @@ form {
     -webkit-appearance: none;
     -moz-appearance: none;
     cursor: pointer;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M208%2096L128%20176L48%2096Z%22%2F%3E%3C%2Fsvg%3E'); /* Icon mũi tên xuống tùy chỉnh */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M208%2096L128%20176L48%2096Z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat;
     background-position: right 15px center;
     background-size: 16px;
@@ -231,17 +231,17 @@ form {
     margin: 20px auto;
     width: 100%;
     max-width: 450px;
-    background-color: #2a2a3e; /* Màu nền tối hơn, tương tự #file-label */
+    background-color: #2a2a3e;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     overflow: hidden;
     transition: all 0.3s ease;
-    border: 2px solid transparent; /* Viền mặc định trong suốt */
+    border: 2px solid transparent;
 }
 
 .search-container:focus-within {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    border-color: #8c7ae6; /* Màu viền khi focus, màu tím chủ đạo */
+    border-color: #8c7ae6;
 }
 
 .search-container input[type="text"] {
@@ -250,17 +250,17 @@ form {
     border: none;
     outline: none;
     font-size: 1.05em;
-    background-color: transparent; /* Input không có màu nền riêng, dùng màu của container */
-    color: #e0e0e0; /* Màu chữ sáng cho phù hợp với nền tối */
+    background-color: transparent;
+    color: #e0e0e0;
 }
 
 .search-container input[type="text"]::placeholder {
-    color: #b0b0b0; /* Màu placeholder nhạt hơn */
+    color: #b0b0b0;
 }
 
 .search-container button {
     padding: 12px 20px;
-    background-color: #8c7ae6; /* Màu nút tìm kiếm là màu tím chủ đạo */
+    background-color: #8c7ae6;
     color: white;
     border: none;
     cursor: pointer;
@@ -272,13 +272,13 @@ form {
 }
 
 .search-container button:hover {
-    background-color: #a491f0; /* Màu tím nhạt hơn khi hover */
+    background-color: #a491f0;
     transform: translateY(-1px);
 }
 
 .search-container button:active {
     transform: translateY(0);
-    background-color: #7a6ab8; /* Một sắc thái tím đậm hơn một chút khi active */
+    background-color: #7a6ab8;
 }
 
 .search-container button i {
