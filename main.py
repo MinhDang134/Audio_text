@@ -9,8 +9,8 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from sqlalchemy import select
 import uuid
+import json
 
-from sqlmodel import SQLModel
 
 from audio.database import get_session, engine
 from audio.models import audiot
@@ -36,8 +36,29 @@ except Exception as e:
     model = None
     model_hai = None
 
-prompt_instructions = "*câu hỏi 1 :* viết chi tiết toàn bộ cuộc hội thoại ra , chia ra người khách hàng là speaker 1 , còn nhân viên chăm sóc khách hàng là speaker 2 , phân tích chuẩn từng câu từng chữ nhất có thể  "
+prompt_instructions = """
+Bạn là một trợ lý phân tích cuộc gọi. Hãy phân tích cuộc hội thoại được cung cấp và trả về kết quả dưới dạng JSON theo cấu trúc sau:
 
+{
+  "conversation": [
+    {
+      "speaker": "Speaker 1",
+      "timestamp": "HH:MM:SS",
+      "utterance": "Câu nói của khách hàng."
+    },
+    {
+      "speaker": "Speaker 2",
+      "timestamp": "HH:MM:SS",
+      "utterance": "Câu nói của nhân viên chăm sóc khách hàng."
+    },
+    // ... các câu nói khác
+  ],
+  "summary": "Tóm tắt cuộc hội thoại (nếu có yêu cầu thêm)",
+  "sentiment": "Phân tích cảm xúc chung (nếu có yêu cầu thêm)"
+}
+
+*câu hỏi 1:* viết chi tiết toàn bộ cuộc hội thoại ra , chia ra người khách hàng là speaker 1 , còn nhân viên chăm sóc khách hàng là speaker 2 , phân tích chuẩn từng câu từng chữ nhất có thể , và hiển thị luôn thời gian đối tượng nói từng câu
+"""
 
 def send_to_webhook(payload: dict, job_id: str):
     try:
@@ -104,6 +125,21 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
             raise HTTPException(status_code=500, detail="Chương trình lỗi rồi ")
 
         report_text = response.text
+        # try:
+        #     # Cố gắng parse chuỗi report_text thành đối tượng JSON
+        #     report_data = json.loads(report_text)
+        #     # Nếu parse thành công, bạn có thể sử dụng report_data ở đây
+        #     # Ví dụ: report_data["conversation"]
+        #     # Để lưu vào DB hoặc gửi qua webhook, bạn có thể chuyển ngược lại thành chuỗi JSON
+        #     report_text = json.dumps(report_data, ensure_ascii=False, indent=2)  # Định dạng lại cho đẹp
+        # except json.JSONDecodeError as e:
+        #     print(f"[{job_id}] Lỗi khi phân tích JSON từ phản hồi của AI: {e}")
+        #     print(f"[{job_id}] Phản hồi gốc: {report_text[:500]}...")  # In ra một phần của phản hồi để debug
+        #     # Xử lý lỗi: có thể trả về lỗi hoặc lưu chuỗi gốc vào DB
+        #     report_text = report_text  # Giữ nguyên chuỗi gốc nếu không thể parse
+        #     analysis_jobs[str(job_id)]["status"] = "AI_REPORT_PARSE_FAILED"
+        #     analysis_jobs[str(job_id)]["error"] = f"AI response not valid JSON: {str(e)}"
+        #     # Bạn có thể muốn raise HTTPException ở đây hoặc có một cơ chế báo lỗi khác
 
 
         analysis_jobs[str(job_id)]["status"] = "Thành Công"
