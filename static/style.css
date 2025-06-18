@@ -7,7 +7,7 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    align-items: flex-start; /* Changed to flex-start for better top alignment */
     min-height: 100vh;
     box-sizing: border-box;
     padding: 20px;
@@ -23,24 +23,29 @@ body {
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background-color: #202030; /* Added a background color for the wrapper */
 }
 
 .history-sidebar {
-    width: 250px;
-    background-color: #202030;
-    padding: 20px;
-    border-right: 1px solid #4a4a5c;
+    width: 280px; /* Tăng chiều rộng để nội dung dễ đọc hơn */
+    background-color: #1a1a2e; /* Nền tối hơn để tạo sự tương phản */
+    padding: 30px 20px; /* Tăng padding */
+    border-right: 1px solid #3a3a4a; /* Đường viền nhẹ nhàng hơn */
     overflow-y: auto;
     box-sizing: border-box;
     flex-shrink: 0;
+    position: relative; /* Thêm để đặt scrollbar */
 }
 
 .history-sidebar h2 {
     margin-top: 0;
-    font-size: 1.4em;
+    font-size: 1.6em; /* Cỡ chữ lớn hơn */
     color: #8c7ae6;
-    margin-bottom: 20px;
+    margin-bottom: 25px; /* Khoảng cách dưới lớn hơn */
     text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .history-list {
@@ -49,42 +54,64 @@ body {
     margin: 0;
 }
 
-
 .history-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #35354a;
-    background-color: #2a2a3e;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    padding: 12px 15px; /* Tăng padding */
+    border-radius: 10px; /* Bo tròn nhiều hơn */
+    margin-bottom: 10px; /* Khoảng cách giữa các mục */
+    background-color: #2a2a3e; /* Nền của từng mục */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ nhàng */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* Để sử dụng pseudo-elements cho hiệu ứng */
+    overflow: hidden; /* Đảm bảo các hiệu ứng không tràn ra ngoài */
 }
 
-.history-item:last-child {
-    border-bottom: none;
+.history-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px; /* Đường viền màu ở bên trái */
+    height: 100%;
+    background-color: #8c7ae6; /* Màu chủ đạo */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
 }
 
 .history-item:hover {
     background-color: #35354a;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px); /* Nhấc lên nhẹ khi hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.history-item:hover::before {
+    transform: translateX(0); /* Hiển thị đường viền màu */
 }
 
 .history-item a {
     flex-grow: 1;
-    margin-right: 5px;
+    margin-right: 10px; /* Khoảng cách giữa text và nút xóa */
     color: #e0e0e0;
     text-decoration: none;
     display: block;
-    padding: 10px 15px;
-    border-radius: 8px;
-    transition: color 0.2s ease;
+    font-size: 0.95em; /* Kích thước chữ nhỏ hơn một chút */
+    line-height: 1.4; /* Tăng line-height cho dễ đọc */
     word-break: break-all;
+    transition: color 0.2s ease;
+    padding-right: 10px; /* Tránh text chạm vào nút xóa */
+}
+
+.history-item a strong {
+    color: #a491f0; /* Màu nổi bật cho job_id */
+    font-weight: 600;
+    display: block; /* Đảm bảo job_id xuống dòng */
+    margin-bottom: 2px;
 }
 
 .history-item a:hover {
-    color: #a491f0;
+    color: #b0b0b0; /* Màu chữ hơi mờ đi khi hover */
 }
 
 .delete-btn {
@@ -92,21 +119,43 @@ body {
     border: none;
     color: #dc3545;
     cursor: pointer;
-    font-size: 1em;
-    padding: 10px 15px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    display: flex; /* To center icon */
+    font-size: 0.9em; /* Kích thước icon nhỏ hơn */
+    padding: 8px; /* Giảm padding */
+    border-radius: 50%; /* Làm tròn nút */
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    width: 35px; /* Đảm bảo kích thước cố định */
+    height: 35px; /* Đảm bảo kích thước cố định */
 }
 
 .delete-btn:hover {
     background-color: rgba(220, 53, 69, 0.2);
+    color: #ff6b81; /* Màu đỏ sáng hơn khi hover */
 }
 .delete-btn:active {
     transform: translateY(1px);
+}
+
+/* Scrollbar styling for history sidebar */
+.history-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-sidebar::-webkit-scrollbar-track {
+    background: #1a1a2e; /* Nền của thanh cuộn */
+    border-radius: 10px;
+}
+
+.history-sidebar::-webkit-scrollbar-thumb {
+    background: #4a4a5c; /* Màu của "cục" cuộn */
+    border-radius: 10px;
+}
+
+.history-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #6c757d; /* Màu khi hover vào "cục" cuộn */
 }
 
 

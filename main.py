@@ -54,7 +54,34 @@ except Exception as e:
     model_hai = None
 
 prompt_instructions = """
-*câu hỏi 1:* viết chi tiết toàn bộ cuộc hội thoại ra , chia ra người khách hàng là speaker 1 , còn nhân viên chăm sóc khách hàng là speaker 2 , phân tích chuẩn từng câu từng chữ nhất có thể , và hiển thị luôn thời gian đối tượng nói từng câu
+
+Bạn là một công cụ phân tích cuộc hội thoại. Nhiệm vụ của bạn là phân tích một đoạn hội thoại được cung cấp, xác định người nói (Speaker 1 là khách hàng, Speaker 2 là nhân viên chăm sóc khách hàng), ghi lại từng câu nói một cách chính xác và kèm theo thời gian tương ứng của mỗi câu. Kết quả phải được trả về dưới định dạng JSON chuẩn. xuống dòng đàng hoàng cho tôi nhé đừng in cả một cục 
+
+---
+
+**Định dạng JSON mong muốn:**
+
+```json
+{
+  "conversation_id": "ID_cuoc_hoi_thoai_nay",
+  "speakers": {
+    "speaker1_role": "customer",
+    "speaker2_role": "customer_service_representative"
+  },
+  "dialogue": [
+    {
+      "speaker": "speaker1",
+      "timestamp": "HH:MM:SS",
+      "text": "Câu nói của speaker 1."
+    },
+    {
+      "speaker": "speaker2",
+      "timestamp": "HH:MM:SS",
+      "text": "Câu nói của speaker 2."
+    },
+    // ... các đoạn hội thoại tiếp theo
+  ]
+}
 """
 
 def send_to_webhook(payload: dict, job_id: str):
