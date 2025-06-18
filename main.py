@@ -103,7 +103,7 @@ def send_to_webhook(payload: dict, job_id: str):
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("chatbox.html", {"request": request})
 
 
 @app.post("/analyze")

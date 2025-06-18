@@ -1,0 +1,218 @@
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.chatbox-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+    min-height: calc(100vh - 40px);
+}
+
+.welcome-message {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 100px;
+}
+
+.welcome-message h1 {
+    font-size: 3em;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin: 0;
+}
+
+.gradient-text {
+    background: linear-gradient(to right, #8c7ae6, #a491f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #8c7ae6; /* Fallback for browsers that don't support text-fill-color */
+    font-weight: 700;
+}
+
+.chat-input-area {
+    width: 100%;
+    padding-bottom: 20px; /* Space from the bottom of the viewport */
+    display: flex;
+    justify-content: center;
+}
+
+.chat-input-wrapper {
+    display: flex;
+    align-items: flex-end;
+    background-color: #2a2a3e;
+    border-radius: 28px;
+    padding: 10px 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 700px;
+    box-sizing: border-box;
+    position: relative;
+    padding-bottom: 45px; /* Make space for bottom options */
+}
+
+.chat-input-wrapper:focus-within {
+    border: 1px solid #8c7ae6;
+    box-shadow: 0 4px 20px rgba(140, 122, 230, 0.3);
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    color: #b0b0b0;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon-button:hover {
+    background-color: rgba(140, 122, 230, 0.1);
+    color: #e0e0e0;
+}
+
+.icon-button.plus-button {
+    margin-right: 10px;
+}
+
+.icon-button.microphone-button {
+    margin-left: 10px;
+    color: #8c7ae6; /* Main color for microphone */
+}
+
+.icon-button.microphone-button:hover {
+    background-color: rgba(140, 122, 230, 0.2);
+}
+
+.chat-input-field {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    color: #e0e0e0;
+    font-size: 1.1em;
+    padding: 8px 0;
+    min-height: 20px; /* Adjust height as needed */
+    resize: none; /* Disable resizing for textarea, if used */
+}
+
+.chat-input-field::placeholder {
+    color: #b0b0b0;
+}
+
+.bottom-options {
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.option-button {
+    background-color: #35354a;
+    color: #b0b0b0;
+    border: none;
+    border-radius: 18px;
+    padding: 6px 12px;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.option-button i {
+    margin-right: 6px;
+    color: #a491f0; /* Icon color */
+}
+
+.option-button:hover {
+    background-color: #4a4a5c;
+    color: #e0e0e0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .welcome-message h1 {
+        font-size: 2.5em;
+    }
+
+    .chat-input-wrapper {
+        padding: 8px 10px;
+        padding-bottom: 40px; /* Adjust for smaller screens */
+        align-items: center;
+    }
+
+    .icon-button {
+        padding: 8px;
+        font-size: 1.1em;
+    }
+
+    .chat-input-field {
+        font-size: 1em;
+    }
+
+    .bottom-options {
+        left: 10px;
+        bottom: 8px;
+        gap: 8px;
+    }
+
+    .option-button {
+        padding: 5px 10px;
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-message h1 {
+        font-size: 2em;
+    }
+
+    .chat-input-wrapper {
+        padding: 5px 8px;
+        padding-bottom: 35px;
+    }
+
+    .icon-button {
+        font-size: 1em;
+        padding: 6px;
+    }
+
+    .chat-input-field {
+        font-size: 0.9em;
+    }
+
+    .bottom-options {
+        left: 8px;
+        bottom: 5px;
+        gap: 6px;
+    }
+
+    .option-button {
+        padding: 4px 8px;
+        font-size: 0.75em;
+    }
+}

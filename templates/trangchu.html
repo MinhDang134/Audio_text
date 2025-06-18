@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu thông tin - iCheck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='trangchu.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header-section">
+            <h1>Tra cứu thông tin</h1>
+            <p class="tagline">
+                Tôi là trợ lý cá nhân của bạn! Tôi sẽ giúp bạn nhanh chóng tra cứu thông tin về các giải pháp và dịch vụ
+                của iCheck, hỗ trợ bạn đưa ra quyết định chính xác và hiệu quả.
+            </p>
+        </header>
+
+        <section class="info-cards-grid">
+            <div class="info-card">
+                <div class="card-icon icon-orange">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3>Tính năng sản phẩm/ dịch vụ</h3>
+                <p>Tra cứu nhanh thông tin sản phẩm/dịch vụ (mô tả, tính năng, lợi ích)</p>
+            </div>
+
+            <div class="info-card">
+                <div class="card-icon icon-orange">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>Quy trình, chính sách</h3>
+                <p>Quy trình vận hành của các doanh nghiệp, biểu mẫu, chính sách</p>
+            </div>
+
+            <div class="info-card">
+                <div class="card-icon icon-orange">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <h3>Phần mềm giải pháp</h3>
+                <p>Hướng dẫn thao tác phần mềm giải pháp/ phần mềm nội bộ</p>
+            </div>
+
+            <div class="info-card">
+                <div class="card-icon icon-orange">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <h3>Thư viện phản đối thường gặp</h3>
+                <p>Thư viện tình huống phản đối thường gặp và hướng xử lý phù hợp</p>
+            </p>
+            </div>
+        </section>
+
+        <section class="chat-input-section">
+            <div class="chat-input-wrapper">
+                <input type="text" placeholder="Hỏi bất kỳ điều gì">
+                <div class="ai-model-select">
+                    <i class="fas fa-robot"></i> <span>CHAT BOT AI 1.0</span>
+                    <i class="fas fa-caret-down"></i> </div>
+                <button class="send-button">
+                    <i class="fas fa-paper-plane"></i> </button>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
