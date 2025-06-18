@@ -1,14 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Ngăn cuộn chính của trang */
+}
+
 body {
     background-color: #1a1a2e;
     color: #e0e0e0;
     font-family: 'Inter', sans-serif;
-    margin: 0;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Changed to flex-start for better top alignment */
-    min-height: 100vh;
+    align-items: flex-start;
+
     box-sizing: border-box;
     padding: 20px;
 }
@@ -17,32 +23,31 @@ body {
     display: flex;
     width: 100%;
     height: 100vh;
-    box-sizing: border-box;
-    max-width: 1200px;
+
     margin: 0;
-    border-radius: 15px;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    background-color: #202030; /* Added a background color for the wrapper */
+    box-shadow: none;
+    background-color: #202030;
 }
 
 .history-sidebar {
-    width: 280px; /* Tăng chiều rộng để nội dung dễ đọc hơn */
-    background-color: #1a1a2e; /* Nền tối hơn để tạo sự tương phản */
-    padding: 30px 20px; /* Tăng padding */
-    border-right: 1px solid #3a3a4a; /* Đường viền nhẹ nhàng hơn */
+    width: 400px;
+    background-color: #1a1a2e;
+    padding: 30px 20px;
+    border-right: 1px solid #3a3a4a;
     overflow-y: auto;
     box-sizing: border-box;
     flex-shrink: 0;
-    position: relative; /* Thêm để đặt scrollbar */
+    position: relative;
 }
 
 .history-sidebar h2 {
     margin-top: 0;
-    font-size: 1.6em; /* Cỡ chữ lớn hơn */
+    font-size: 1.6em;
     color: #8c7ae6;
-    margin-bottom: 25px; /* Khoảng cách dưới lớn hơn */
-    text-align: center;
+    margin-bottom: 25px;
+    text-align: start;
     font-weight: 700;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -58,14 +63,14 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 15px; /* Tăng padding */
-    border-radius: 10px; /* Bo tròn nhiều hơn */
-    margin-bottom: 10px; /* Khoảng cách giữa các mục */
-    background-color: #2a2a3e; /* Nền của từng mục */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ nhàng */
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background-color: #2a2a3e;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative; /* Để sử dụng pseudo-elements cho hiệu ứng */
-    overflow: hidden; /* Đảm bảo các hiệu ứng không tràn ra ngoài */
+    position: relative;
+    overflow: hidden;
 }
 
 .history-item::before {
@@ -73,45 +78,45 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    width: 3px; /* Đường viền màu ở bên trái */
+    width: 3px;
     height: 100%;
-    background-color: #8c7ae6; /* Màu chủ đạo */
+    background-color: #8c7ae6;
     transform: translateX(-100%);
     transition: transform 0.3s ease-out;
 }
 
 .history-item:hover {
     background-color: #35354a;
-    transform: translateY(-3px); /* Nhấc lên nhẹ khi hover */
+    transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 .history-item:hover::before {
-    transform: translateX(0); /* Hiển thị đường viền màu */
+    transform: translateX(0);
 }
 
 .history-item a {
     flex-grow: 1;
-    margin-right: 10px; /* Khoảng cách giữa text và nút xóa */
+    margin-right: 10px;
     color: #e0e0e0;
     text-decoration: none;
     display: block;
-    font-size: 0.95em; /* Kích thước chữ nhỏ hơn một chút */
-    line-height: 1.4; /* Tăng line-height cho dễ đọc */
+    font-size: 0.95em;
+    line-height: 1.4;
     word-break: break-all;
     transition: color 0.2s ease;
-    padding-right: 10px; /* Tránh text chạm vào nút xóa */
+    padding-right: 10px;
 }
 
 .history-item a strong {
-    color: #a491f0; /* Màu nổi bật cho job_id */
+    color: #a491f0;
     font-weight: 600;
-    display: block; /* Đảm bảo job_id xuống dòng */
+    display: block;
     margin-bottom: 2px;
 }
 
 .history-item a:hover {
-    color: #b0b0b0; /* Màu chữ hơi mờ đi khi hover */
+    color: #b0b0b0;
 }
 
 .delete-btn {
@@ -119,43 +124,43 @@ body {
     border: none;
     color: #dc3545;
     cursor: pointer;
-    font-size: 0.9em; /* Kích thước icon nhỏ hơn */
-    padding: 8px; /* Giảm padding */
-    border-radius: 50%; /* Làm tròn nút */
+    font-size: 0.9em;
+    padding: 8px;
+    border-radius: 50%;
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 35px; /* Đảm bảo kích thước cố định */
-    height: 35px; /* Đảm bảo kích thước cố định */
+    width: 35px;
+    height: 35px;
 }
 
 .delete-btn:hover {
     background-color: rgba(220, 53, 69, 0.2);
-    color: #ff6b81; /* Màu đỏ sáng hơn khi hover */
+    color: #ff6b81;
 }
 .delete-btn:active {
     transform: translateY(1px);
 }
 
-/* Scrollbar styling for history sidebar */
+
 .history-sidebar::-webkit-scrollbar {
     width: 6px;
 }
 
 .history-sidebar::-webkit-scrollbar-track {
-    background: #1a1a2e; /* Nền của thanh cuộn */
+    background: #1a1a2e;
     border-radius: 10px;
 }
 
 .history-sidebar::-webkit-scrollbar-thumb {
-    background: #4a4a5c; /* Màu của "cục" cuộn */
+    background: #4a4a5c;
     border-radius: 10px;
 }
 
 .history-sidebar::-webkit-scrollbar-thumb:hover {
-    background: #6c757d; /* Màu khi hover vào "cục" cuộn */
+    background: #6c757d;
 }
 
 
@@ -168,6 +173,7 @@ body {
     align-items: center;
     text-align: center;
     box-sizing: border-box;
+    min-width: 300px;
 }
 
 h1 {
@@ -550,5 +556,74 @@ form {
     }
     .modal-buttons button {
         padding: 10px 20px;
+    }
+}
+
+.main-options {
+    margin-bottom: 30px; /* Khoảng cách giữa các option và tiêu đề lịch sử */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Khoảng cách giữa các mục option */
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: #2a2a3e; /* Nền giống lịch sử tìm kiếm */
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid transparent; /* Border mặc định */
+}
+
+.option-item:hover {
+    background-color: #35354a;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    border-color: #8c7ae6; /* Màu border khi hover */
+}
+
+.option-item.active {
+    background-color: #4a4a5c; /* Màu nền cho mục đang hoạt động */
+    border-color: #8c7ae6; /* Màu border cho mục đang hoạt động */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+.option-item i {
+    font-size: 1.2em; /* Kích thước icon */
+    margin-right: 15px; /* Khoảng cách giữa icon và text */
+    color: #a491f0; /* Màu icon */
+    min-width: 25px; /* Đảm bảo icon có độ rộng nhất định */
+    text-align: center;
+}
+
+.option-item span {
+    font-size: 1.05em; /* Kích thước chữ */
+    color: #e0e0e0; /* Màu chữ */
+    flex-grow: 1; /* Cho phép text co giãn */
+    white-space: nowrap; /* Ngăn không cho text xuống dòng */
+    overflow: hidden; /* Ẩn phần text tràn ra */
+    text-overflow: ellipsis; /* Thêm dấu ba chấm nếu text quá dài */
+}
+
+/* Điều chỉnh lại padding của history-sidebar để có khoảng trống cho menu */
+.history-sidebar {
+    /* ... các thuộc tính khác giữ nguyên ... */
+    padding: 30px 20px; /* Đảm bảo đủ padding ở trên cùng */
+}
+
+/* Điều chỉnh khoảng cách cho tiêu đề Lịch sử tìm kiếm để không quá sát menu */
+.history-sidebar h2 {
+    /* ... các thuộc tính khác giữ nguyên ... */
+    margin-top: 30px; /* Thêm khoảng cách phía trên tiêu đề lịch sử */
+}
+
+/* Media queries cho main-options (khi sidebar ẩn) */
+@media (max-width: 900px) {
+    /* main-options sẽ ẩn theo history-sidebar */
+    .main-options {
+        display: none;
     }
 }

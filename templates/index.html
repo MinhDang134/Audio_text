@@ -10,6 +10,24 @@
 <body>
 <div class="app-wrapper">
     <div class="history-sidebar">
+        <div class="main-options">
+            <div class="option-item active">
+                <i class="fas fa-search"></i>
+                <span>AI Tra cứu sơ bộ</span>
+            </div>
+            <div class="option-item">
+                <i class="fas fa-book"></i>
+                <span>AI Tra cứu thông tin</span>
+            </div>
+            <div class="option-item">
+                <i class="fas fa-phone-alt"></i>
+                <span>AI Phân tích cuộc g...</span>
+            </div>
+            <div class="option-item">
+                <i class="fas fa-crosshairs"></i>
+                <span>AI Roleplay, xử lý tì...</span>
+            </div>
+        </div>
         <h2>Lịch sử tìm kiếm</h2>
         <ul id="search-history-list" class="history-list">
         </ul>
@@ -57,6 +75,7 @@
 </div>
 
 <script>
+    // ... (Giữ nguyên JavaScript của bạn) ...
     const form = document.getElementById('upload-form');
     const fileInput = document.getElementById('audio-file');
     const fileLabel = document.getElementById('file-label');
