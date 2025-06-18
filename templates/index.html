@@ -46,6 +46,16 @@
     </div>
 </div>
 
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-content">
+        <p>Bạn có chắc chắn muốn xóa mục này không?</p>
+        <div class="modal-buttons">
+            <button class="confirm-btn" id="confirmDeleteBtn">Xóa</button>
+            <button class="cancel-btn" id="cancelDeleteBtn">Hủy</button>
+        </div>
+    </div>
+</div>
+
 <script>
     const form = document.getElementById('upload-form');
     const fileInput = document.getElementById('audio-file');
@@ -59,27 +69,42 @@
     const searchButton = document.getElementById('search-button');
     const searchHistoryList = document.getElementById('search-history-list');
 
-    // Hàm để tải lịch sử tìm kiếm rút gọn từ API
+    // Modal elements
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+    let currentJobIdToDelete = null;
+
+
     async function loadSearchHistorySummary() {
         try {
             const response = await fetch('/history_summary');
             if (response.ok) {
                 const historySummary = await response.json();
-                searchHistoryList.innerHTML = ''; // Xóa lịch sử hiện tại
-                historySummary.forEach(item => {
-                    addSearchHistoryItem(item);
-                });
+                searchHistoryList.innerHTML = '';
+                if (historySummary.length === 0) {
+                    searchHistoryList.innerHTML = '<li style="text-align: center; color: #888; padding: 10px;">Chưa có lịch sử nào.</li>';
+                } else {
+                    historySummary.forEach(item => {
+                        addSearchHistoryItem(item);
+                    });
+                }
             } else {
                 console.error('Không thể tải lịch sử tóm tắt:', response.statusText);
+                statusElement.textContent = 'Lỗi: Không thể tải lịch sử tìm kiếm.';
             }
         } catch (error) {
             console.error('Lỗi khi tải lịch sử tóm tắt:', error);
+            statusElement.textContent = 'Lỗi kết nối khi tải lịch sử.';
         }
     }
 
-    // Hàm để thêm một mục vào danh sách lịch sử tìm kiếm trên giao diện
+
     function addSearchHistoryItem(item) {
         const listItem = document.createElement('li');
+        listItem.classList.add('history-item');
+
         const link = document.createElement('a');
         link.href = '#';
         link.innerHTML = `<strong>${item.job_id}</strong> - ${item.source_file}`;
@@ -87,11 +112,51 @@
             e.preventDefault();
             await fetchAndDisplayJobDetails(item.job_id);
         };
+
+        const deleteButton = document.createElement('button');
+        deleteButton.classList.add('delete-btn');
+        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        deleteButton.title = 'Xóa mục này';
+        deleteButton.onclick = (e) => {
+            e.stopPropagation();
+            currentJobIdToDelete = item.job_id;
+            deleteConfirmModal.style.display = 'flex';
+        };
+
         listItem.appendChild(link);
+        listItem.appendChild(deleteButton);
         searchHistoryList.appendChild(listItem);
     }
 
-    // Hàm để lấy và hiển thị chi tiết job_id
+    // Hàm để xử lý xóa job
+    async function handleDeleteJob(jobId) {
+        statusElement.textContent = `Đang xóa job_id: ${jobId}...`;
+        resultContainer.style.display = 'none';
+
+        try {
+            const response = await fetch(`/delete/${jobId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                statusElement.textContent = result.message || `Job ${jobId} đã được xóa thành công!`;
+                await loadSearchHistorySummary();
+
+                if (resultContainer.textContent.includes(jobId)) {
+                    resultContainer.textContent = '';
+                    resultContainer.style.display = 'none';
+                }
+            } else {
+                const errorResult = await response.json();
+                throw new Error(errorResult.detail || 'Lỗi không xác định khi xóa job.');
+            }
+        } catch (error) {
+            statusElement.textContent = `Lỗi xóa job: ${error.message}`;
+            console.error('Lỗi xóa:', error);
+        }
+    }
+
     async function fetchAndDisplayJobDetails(jobId) {
         statusElement.textContent = `Đang tải chi tiết cho job_id: ${jobId}...`;
         resultContainer.style.display = 'none';
@@ -162,10 +227,10 @@
             const result = await response.json();
 
             if (response.ok) {
-                resultContainer.textContent = result.report;
+                resultContainer.textContent = JSON.stringify(result, null, 2);
                 resultContainer.style.display = 'block';
                 statusElement.textContent = 'Phân tích hoàn tất!';
-                await loadSearchHistorySummary(); // Tải lại lịch sử sau khi phân tích thành công
+                await loadSearchHistorySummary();
             } else {
                 throw new Error(result.detail || 'Lỗi không xác định từ server.');
             }
@@ -174,6 +239,28 @@
             statusElement.textContent = `Lỗi: ${error.message}`;
         } finally {
             submitBtn.disabled = false;
+        }
+    });
+
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+        if (currentJobIdToDelete) {
+            await handleDeleteJob(currentJobIdToDelete);
+            currentJobIdToDelete = null;
+        }
+        deleteConfirmModal.style.display = 'none';
+    });
+
+    cancelDeleteBtn.addEventListener('click', () => {
+        currentJobIdToDelete = null;
+        deleteConfirmModal.style.display = 'none';
+    });
+
+
+    deleteConfirmModal.addEventListener('click', (e) => {
+        if (e.target === deleteConfirmModal) {
+            currentJobIdToDelete = null;
+            deleteConfirmModal.style.display = 'none';
         }
     });
 </script>
