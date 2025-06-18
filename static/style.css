@@ -405,7 +405,7 @@ form {
     margin: 0;
 }
 
-/* Modal Styles */
+
 .modal {
     display: none; /* Đã sửa: Ban đầu ẩn modal */
     position: fixed;
@@ -416,7 +416,6 @@ form {
     height: 100%;
     overflow: auto;
     background-color: rgba(0,0,0,0.6);
-    /* display: flex; <--- Bỏ dòng này ở đây. Sẽ được set bằng JS khi cần hiển thị */
     align-items: center;
     justify-content: center;
 }
@@ -560,10 +559,10 @@ form {
 }
 
 .main-options {
-    margin-bottom: 30px; /* Khoảng cách giữa các option và tiêu đề lịch sử */
+    margin-bottom: 30px;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Khoảng cách giữa các mục option */
+    gap: 10px;
 }
 
 .option-item {
@@ -586,43 +585,42 @@ form {
 }
 
 .option-item.active {
-    background-color: #4a4a5c; /* Màu nền cho mục đang hoạt động */
-    border-color: #8c7ae6; /* Màu border cho mục đang hoạt động */
+    background-color: #4a4a5c;
+    border-color: #8c7ae6;
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
 
 .option-item i {
-    font-size: 1.2em; /* Kích thước icon */
-    margin-right: 15px; /* Khoảng cách giữa icon và text */
-    color: #a491f0; /* Màu icon */
-    min-width: 25px; /* Đảm bảo icon có độ rộng nhất định */
+    font-size: 1.2em;
+    margin-right: 15px;
+    color: #a491f0;
+    min-width: 25px;
     text-align: center;
 }
 
 .option-item span {
-    font-size: 1.05em; /* Kích thước chữ */
-    color: #e0e0e0; /* Màu chữ */
-    flex-grow: 1; /* Cho phép text co giãn */
-    white-space: nowrap; /* Ngăn không cho text xuống dòng */
-    overflow: hidden; /* Ẩn phần text tràn ra */
-    text-overflow: ellipsis; /* Thêm dấu ba chấm nếu text quá dài */
+    font-size: 1.05em;
+    color: #e0e0e0;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Điều chỉnh lại padding của history-sidebar để có khoảng trống cho menu */
+
 .history-sidebar {
-    /* ... các thuộc tính khác giữ nguyên ... */
-    padding: 30px 20px; /* Đảm bảo đủ padding ở trên cùng */
+
+    padding: 30px 20px;
 }
 
-/* Điều chỉnh khoảng cách cho tiêu đề Lịch sử tìm kiếm để không quá sát menu */
+
 .history-sidebar h2 {
-    /* ... các thuộc tính khác giữ nguyên ... */
-    margin-top: 30px; /* Thêm khoảng cách phía trên tiêu đề lịch sử */
+
+    margin-top: 30px;
 }
 
-/* Media queries cho main-options (khi sidebar ẩn) */
+
 @media (max-width: 900px) {
-    /* main-options sẽ ẩn theo history-sidebar */
     .main-options {
         display: none;
     }
