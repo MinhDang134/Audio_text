@@ -7,7 +7,7 @@ from sqlalchemy import select
 import uuid
 from audio.database import get_session, engine
 from audio.models import audiot, history
-
+import requests
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -243,7 +243,7 @@ def send_to_webhook(payload: dict, job_id: str):
         response.raise_for_status()
         print(f"[{job_id}] Gửi webhook thành công!")
         analysis_jobs[job_id] = {"status": "WEBHOOK_SENT"}
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         print(f"[{job_id}] Lỗi khi gửi webhook: {e}")
         analysis_jobs[job_id] = {"status": "WEBHOOK_FAILED", "error": str(e)}
 

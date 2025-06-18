@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phân tích cuộc gọi - MinhDang_chill</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='/audio.css') }}">
+    </head>
+<body>
+<div class="app-container">
+    <h1>MinhDang_chill</h1>
+
+    <form id="upload-form">
+        <label for="audio-file" id="file-label">
+            <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
+            <p>Kéo hoặc tải file vào đây</p>
+            <span id="file-name"></span>
+        </label>
+        <input type="file" name="audio_file" id="audio-file" accept="audio/*" required style="display:none;">
+
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Tìm kiếm job_id...">
+            <button type="button" id="search-button"><i class="fas fa-search"></i></button>
+        </div>
+
+        <div class="model-selection">
+            <label for="ai-model">Chọn Mô hình AI:</label>
+            <select name="ai_model" id="ai-model">
+                <option value="model_a">Gemini 1.5</option>
+                <option value="model_b">Gemini 2.0 (Flash)</option>
+            </select>
+        </div>
+        <button type="submit" id="submit-btn">Phân tích</button>
+    </form>
+
+    <p id="status"></p>
+    <pre id="result-container" style="display:none;"></pre>
+</div>
+
+{#<div id="deleteConfirmModal" class="modal">#}
+{#    <div class="modal-content">#}
+{#        <p>Bạn có chắc chắn muốn xóa mục này không?</p>#}
+{#        <div class="modal-buttons">#}
+{#            <button class="confirm-btn" id="confirmDeleteBtn">Xóa</button>#}
+{#            <button class="cancel-btn" id="cancelDeleteBtn">Hủy</button>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+
+<script>
+    const form = document.getElementById('upload-form');
+    const fileInput = document.getElementById('audio-file');
+    const fileLabel = document.getElementById('file-label');
+    const fileNameSpan = document.getElementById('file-name');
+    const statusElement = document.getElementById('status');
+    const resultContainer = document.getElementById('result-container');
+    const submitBtn = document.getElementById('submit-btn');
+    const aiModelSelect = document.getElementById('ai-model');
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    let currentJobIdToDelete = null;
+
+
+    async function handleDeleteJob(jobId) {
+        statusElement.textContent = `Đang xóa job_id: ${jobId}...`;
+        resultContainer.style.display = 'none';
+
+        try {
+            const response = await fetch(`/delete/${jobId}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                statusElement.textContent = result.message || `Job ${jobId} đã được xóa thành công!`;
+                // loadSearchHistorySummary(); // Hàm này không còn ở đây nữa, nên không gọi
+                if (resultContainer.textContent.includes(jobId)) {
+                    resultContainer.textContent = '';
+                    resultContainer.style.display = 'none';
+                }
+            } else {
+                const errorResult = await response.json();
+                throw new Error(errorResult.detail || 'Lỗi không xác định khi xóa job.');
+            }
+        } catch (error) {
+            statusElement.textContent = `Lỗi xóa job: ${error.message}`;
+            console.error('Lỗi xóa:', error);
+        }
+    }
+
+    async function fetchAndDisplayJobDetails(jobId) {
+        statusElement.textContent = `Đang tải chi tiết cho job_id: ${jobId}...`;
+        resultContainer.style.display = 'none';
+
+        try {
+            const response = await fetch(`/history/${jobId}`);
+            const result = await response.json();
+
+            if (response.ok) {
+                resultContainer.textContent = JSON.stringify(result, null, 2);
+                resultContainer.style.display = 'block';
+                statusElement.textContent = `Chi tiết hoàn tất cho job_id: ${jobId}`;
+            } else {
+                throw new Error(result.detail || 'Không tìm thấy hoặc có lỗi từ server.');
+            }
+        } catch (error) {
+            statusElement.textContent = `Lỗi tải chi tiết: ${error.message}`;
+            resultContainer.textContent = '';
+            resultContainer.style.display = 'none';
+        }
+    }
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            fileNameSpan.textContent = `File đã chọn: ${fileInput.files[0].name}`;
+        } else {
+            fileNameSpan.textContent = '';
+        }
+    });
+
+    searchButton.addEventListener('click', async () => {
+        const searchTerm = searchInput.value.trim();
+
+        if (searchTerm) {
+            await fetchAndDisplayJobDetails(searchTerm);
+        } else {
+            statusElement.textContent = 'Vui lòng nhập job_id để tìm kiếm.';
+        }
+    });
+
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchButton.click();
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append("audio_file", fileInput.files[0]);
+        formData.append("ai_model", aiModelSelect.value);
+
+        submitBtn.disabled = true;
+        statusElement.textContent = 'Đang tải file lên và xử lý...';
+        resultContainer.style.display = 'none';
+
+        try {
+            const response = await fetch('/analyze', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                resultContainer.textContent = JSON.stringify(result, null, 2);
+                resultContainer.style.display = 'block';
+                statusElement.textContent = 'Phân tích hoàn tất!';
+                // loadSearchHistorySummary(); // Hàm này không còn ở đây nữa
+            } else {
+                throw new Error(result.detail || 'Lỗi không xác định từ server.');
+            }
+
+        } catch (error) {
+            statusElement.textContent = `Lỗi: ${error.message}`;
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const jobIdFromUrl = urlParams.get('job_id');
+        if (jobIdFromUrl) {
+            await fetchAndDisplayJobDetails(jobIdFromUrl);
+        }
+    });
+</script>
+</body>
+</html>

@@ -11,9 +11,7 @@
 <div class="app-wrapper">
     <div class="history-sidebar">
         <div class="main-options">
-            <!-- Thêm data-target-url để xác định trang đích -->
-            <!-- Mặc định "AI Tra cứu sơ bộ" là active cho trang này -->
-            <div class="option-item active" data-target-url="{{ url_for('trangchu_id') }}">
+            <div class="option-item" data-target-url="{{ url_for('trangchu_id') }}">
                 <i class="fas fa-search"></i>
                 <span>AI Tra cứu sơ bộ</span>
             </div>
@@ -36,33 +34,8 @@
     </div>
 
     <div class="app-container">
-        <h1>MinhDang_chill</h1>
-
-        <form id="upload-form">
-            <label for="audio-file" id="file-label">
-                <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-                <p>Kéo hoặc tải file vào đây</p>
-                <span id="file-name"></span>
-            </label>
-            <input type="file" name="audio_file" id="audio-file" accept="audio/*" required style="display:none;">
-
-            <div class="search-container">
-                <input type="text" id="search-input" placeholder="Tìm kiếm job_id...">
-                <button type="button" id="search-button"><i class="fas fa-search"></i></button>
-            </div>
-
-            <div class="model-selection">
-                <label for="ai-model">Chọn Mô hình AI:</label>
-                <select name="ai_model" id="ai-model">
-                    <option value="model_a">Gemini 1.5</option>
-                    <option value="model_b">Gemini 2.0 (Flash)</option>
-                </select>
-            </div>
-            <button type="submit" id="submit-btn">Phân tích</button>
-        </form>
-
-        <p id="status"></p>
-        <pre id="result-container" style="display:none;"></pre>
+        <h1>Chào mừng bạn đến với MinhDang_chill!</h1>
+        <p>Vui lòng chọn một chức năng từ thanh bên để bắt đầu.</p>
     </div>
 </div>
 
@@ -77,22 +50,10 @@
 </div>
 
 <script>
-    const form = document.getElementById('upload-form');
-    const fileInput = document.getElementById('audio-file');
-    const fileLabel = document.getElementById('file-label');
-    const fileNameSpan = document.getElementById('file-name');
-    const statusElement = document.getElementById('status');
-    const resultContainer = document.getElementById('result-container');
-    const submitBtn = document.getElementById('submit-btn');
-    const aiModelSelect = document.getElementById('ai-model');
-    const searchInput = document.getElementById('search-input');
-    const searchButton = document.getElementById('search-button');
     const searchHistoryList = document.getElementById('search-history-list');
-
     const deleteConfirmModal = document.getElementById('deleteConfirmModal');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-
     let currentJobIdToDelete = null;
 
     const optionItems = document.querySelectorAll('.option-item');
@@ -106,22 +67,21 @@
         });
     });
 
-    // Hàm để thiết lập trạng thái active dựa trên URL hiện tại
     function setActiveOption() {
         const currentPath = window.location.pathname;
         optionItems.forEach(item => {
             const targetUrl = item.getAttribute('data-target-url');
-            if (targetUrl && currentPath.includes(targetUrl)) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
+            if (targetUrl) {
+                if (currentPath === targetUrl || (targetUrl === '/' && currentPath === '/')) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
             }
         });
     }
 
-    // Gọi hàm khi tải trang
     document.addEventListener('DOMContentLoaded', setActiveOption);
-
 
     async function loadSearchHistorySummary() {
         try {
@@ -138,14 +98,11 @@
                 }
             } else {
                 console.error('Không thể tải lịch sử tóm tắt:', response.statusText);
-                statusElement.textContent = 'Lỗi: Không thể tải lịch sử tìm kiếm.';
             }
         } catch (error) {
             console.error('Lỗi khi tải lịch sử tóm tắt:', error);
-            statusElement.textContent = 'Lỗi kết nối khi tải lịch sử.';
         }
     }
-
 
     function addSearchHistoryItem(item) {
         const listItem = document.createElement('li');
@@ -156,7 +113,7 @@
         link.innerHTML = `<strong>${item.job_id}</strong> - ${item.source_file}`;
         link.onclick = async (e) => {
             e.preventDefault();
-            await fetchAndDisplayJobDetails(item.job_id);
+            window.location.href = `{{ url_for('audio_id') }}?job_id=${item.job_id}`;
         };
 
         const deleteButton = document.createElement('button');
@@ -175,9 +132,6 @@
     }
 
     async function handleDeleteJob(jobId) {
-        statusElement.textContent = `Đang xóa job_id: ${jobId}...`;
-        resultContainer.style.display = 'none';
-
         try {
             const response = await fetch(`/delete/${jobId}`, {
                 method: 'DELETE',
@@ -185,107 +139,18 @@
 
             if (response.ok) {
                 const result = await response.json();
-                statusElement.textContent = result.message || `Job ${jobId} đã được xóa thành công!`;
+                console.log(result.message || `Job ${jobId} đã được xóa thành công!`);
                 await loadSearchHistorySummary();
-
-                if (resultContainer.textContent.includes(jobId)) {
-                    resultContainer.textContent = '';
-                    resultContainer.style.display = 'none';
-                }
             } else {
                 const errorResult = await response.json();
                 throw new Error(errorResult.detail || 'Lỗi không xác định khi xóa job.');
             }
         } catch (error) {
-            statusElement.textContent = `Lỗi xóa job: ${error.message}`;
-            console.error('Lỗi xóa:', error);
-        }
-    }
-
-    async function fetchAndDisplayJobDetails(jobId) {
-        statusElement.textContent = `Đang tải chi tiết cho job_id: ${jobId}...`;
-        resultContainer.style.display = 'none';
-
-        try {
-            const response = await fetch(`/history/${jobId}`);
-            const result = await response.json();
-
-            if (response.ok) {
-                resultContainer.textContent = JSON.stringify(result, null, 2);
-                resultContainer.style.display = 'block';
-                statusElement.textContent = `Chi tiết hoàn tất cho job_id: ${jobId}`;
-            } else {
-                throw new Error(result.detail || 'Không tìm thấy hoặc có lỗi từ server.');
-            }
-        } catch (error) {
-            statusElement.textContent = `Lỗi tải chi tiết: ${error.message}`;
-            resultContainer.textContent = '';
-            resultContainer.style.display = 'none';
+            console.error('Lỗi xóa job:', error);
         }
     }
 
     document.addEventListener('DOMContentLoaded', loadSearchHistorySummary);
-
-    fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-            fileNameSpan.textContent = `File đã chọn: ${fileInput.files[0].name}`;
-        } else {
-            fileNameSpan.textContent = '';
-        }
-    });
-
-    searchButton.addEventListener('click', async () => {
-        const searchTerm = searchInput.value.trim();
-
-        if (searchTerm) {
-            await fetchAndDisplayJobDetails(searchTerm);
-        } else {
-            statusElement.textContent = 'Vui lòng nhập job_id để tìm kiếm.';
-        }
-    });
-
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            searchButton.click();
-        }
-    });
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-        formData.append("audio_file", fileInput.files[0]);
-        formData.append("ai_model", aiModelSelect.value);
-
-        submitBtn.disabled = true;
-        statusElement.textContent = 'Đang tải file lên và xử lý...';
-        resultContainer.style.display = 'none';
-
-        try {
-            const response = await fetch('/analyze', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                resultContainer.textContent = JSON.stringify(result, null, 2);
-                resultContainer.style.display = 'block';
-                statusElement.textContent = 'Phân tích hoàn tất!';
-                await loadSearchHistorySummary();
-            } else {
-                throw new Error(result.detail || 'Lỗi không xác định từ server.');
-            }
-
-        } catch (error) {
-            statusElement.textContent = `Lỗi: ${error.message}`;
-        } finally {
-            submitBtn.disabled = false;
-        }
-    });
-
 
     confirmDeleteBtn.addEventListener('click', async () => {
         if (currentJobIdToDelete) {
@@ -299,7 +164,6 @@
         currentJobIdToDelete = null;
         deleteConfirmModal.style.display = 'none';
     });
-
 
     deleteConfirmModal.addEventListener('click', (e) => {
         if (e.target === deleteConfirmModal) {
