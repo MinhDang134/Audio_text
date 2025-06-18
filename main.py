@@ -200,3 +200,21 @@ def get_job_status(job_id: str):
                 return ketqua
         else:
             raise HTTPException(status_code=404, detail=f"Không tìm thấy job_id: {job_id}")
+
+@app.get("/history/{job_id}")
+def get_job_history(job_id:str):
+    query = select(history).where(history.job_id == job_id)
+    with get_session() as session:
+        result = session.execute(query).first()
+        if result:
+            for row in result:
+                ketqua ={
+                    "job_id": row.job_id,
+                    "source_file": row.source_file,
+                    "status": row.status,
+                    "report": row.report,
+                    "model_ai": row.model_ai
+                }
+                return ketqua
+        else:
+            raise HTTPException(status_code=404, detail=f"Không tìm thấy job_id: {job_id}")
