@@ -173,8 +173,16 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
                 report= " ",
                 model_ai=ai_model
             )
+            analysis_result_history = history(
+                job_id=job_id,
+                status=analysis_jobs[str(job_id)]["status"],
+                source_file=audio_file.filename,
+                report=" ",
+                model_ai=ai_model
+            )
 
             session.add(analysis_result)
+            session.add(analysis_result_history)
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if os.path.exists(temp_file_path):
@@ -218,3 +226,12 @@ def get_job_history(job_id:str):
                 return ketqua
         else:
             raise HTTPException(status_code=404, detail=f"Không tìm thấy job_id: {job_id}")
+
+@app.get("/history_summary")
+def get_history_summary():
+    query = select(history.job_id, history.source_file).order_by(history.job_id.desc()).limit(10)
+    with get_session() as session:
+        results = session.execute(query).fetchall()
+        history_list = [{"job_id": r.job_id, "source_file": r.source_file} for r in results]
+        return history_list
+

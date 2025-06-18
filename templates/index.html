@@ -12,7 +12,7 @@
     <div class="history-sidebar">
         <h2>Lịch sử tìm kiếm</h2>
         <ul id="search-history-list" class="history-list">
-            </ul>
+        </ul>
     </div>
 
     <div class="app-container">
@@ -59,50 +59,63 @@
     const searchButton = document.getElementById('search-button');
     const searchHistoryList = document.getElementById('search-history-list');
 
-    // Hàm để tải lịch sử tìm kiếm từ Local Storage
-    function loadSearchHistory() {
-        const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-        searchHistoryList.innerHTML = ''; // Xóa lịch sử hiện tại
-        history.forEach(item => {
-            addSearchHistoryItem(item, false); // Thêm từng mục vào danh sách
-        });
-    }
-
-    // Hàm để lưu lịch sử tìm kiếm vào Local Storage
-    function saveSearchHistory(item) {
-        const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
-        // Giới hạn số lượng mục trong lịch sử (ví dụ: 10 mục)
-        if (!history.includes(item)) { // Chỉ thêm nếu chưa có trong lịch sử
-            history.unshift(item); // Thêm vào đầu danh sách
-            if (history.length > 10) {
-                history.pop(); // Xóa mục cũ nhất nếu vượt quá giới hạn
+    // Hàm để tải lịch sử tìm kiếm rút gọn từ API
+    async function loadSearchHistorySummary() {
+        try {
+            const response = await fetch('/history_summary');
+            if (response.ok) {
+                const historySummary = await response.json();
+                searchHistoryList.innerHTML = ''; // Xóa lịch sử hiện tại
+                historySummary.forEach(item => {
+                    addSearchHistoryItem(item);
+                });
+            } else {
+                console.error('Không thể tải lịch sử tóm tắt:', response.statusText);
             }
-            localStorage.setItem('searchHistory', JSON.stringify(history));
-            addSearchHistoryItem(item, true); // Thêm vào giao diện ngay lập tức
+        } catch (error) {
+            console.error('Lỗi khi tải lịch sử tóm tắt:', error);
         }
     }
 
     // Hàm để thêm một mục vào danh sách lịch sử tìm kiếm trên giao diện
-    function addSearchHistoryItem(item, prepend = true) {
+    function addSearchHistoryItem(item) {
         const listItem = document.createElement('li');
         const link = document.createElement('a');
         link.href = '#';
-        link.textContent = item;
-        link.onclick = (e) => {
+        link.innerHTML = `<strong>${item.job_id}</strong> - ${item.source_file}`;
+        link.onclick = async (e) => {
             e.preventDefault();
-            searchInput.value = item;
-            searchButton.click();
+            await fetchAndDisplayJobDetails(item.job_id);
         };
         listItem.appendChild(link);
-        if (prepend) {
-            searchHistoryList.prepend(listItem); // Thêm vào đầu danh sách
-        } else {
-            searchHistoryList.appendChild(listItem); // Thêm vào cuối danh sách (khi tải)
+        searchHistoryList.appendChild(listItem);
+    }
+
+    // Hàm để lấy và hiển thị chi tiết job_id
+    async function fetchAndDisplayJobDetails(jobId) {
+        statusElement.textContent = `Đang tải chi tiết cho job_id: ${jobId}...`;
+        resultContainer.style.display = 'none';
+
+        try {
+            const response = await fetch(`/history/${jobId}`);
+            const result = await response.json();
+
+            if (response.ok) {
+                resultContainer.textContent = JSON.stringify(result, null, 2);
+                resultContainer.style.display = 'block';
+                statusElement.textContent = `Chi tiết hoàn tất cho job_id: ${jobId}`;
+            } else {
+                throw new Error(result.detail || 'Không tìm thấy hoặc có lỗi từ server.');
+            }
+        } catch (error) {
+            statusElement.textContent = `Lỗi tải chi tiết: ${error.message}`;
+            resultContainer.textContent = '';
+            resultContainer.style.display = 'none';
         }
     }
 
-    // Tải lịch sử khi trang được tải
-    document.addEventListener('DOMContentLoaded', loadSearchHistory);
+    // Tải lịch sử tóm tắt khi trang được tải
+    document.addEventListener('DOMContentLoaded', loadSearchHistorySummary);
 
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
@@ -116,26 +129,7 @@
         const searchTerm = searchInput.value.trim();
 
         if (searchTerm) {
-            statusElement.textContent = `Đang tìm kiếm job_id: ${searchTerm}...`;
-            resultContainer.style.display = 'none';
-
-            try {
-                const response = await fetch(`/status/${searchTerm}`);
-                const result = await response.json();
-
-                if (response.ok) {
-                    resultContainer.textContent = JSON.stringify(result, null, 2);
-                    resultContainer.style.display = 'block';
-                    statusElement.textContent = `Tìm kiếm hoàn tất cho job_id: ${searchTerm}`;
-                    saveSearchHistory(searchTerm); // Lưu vào lịch sử sau khi tìm kiếm thành công
-                } else {
-                    throw new Error(result.detail || 'Không tìm thấy hoặc có lỗi từ server.');
-                }
-            } catch (error) {
-                statusElement.textContent = `Lỗi tìm kiếm: ${error.message}`;
-                resultContainer.textContent = '';
-                resultContainer.style.display = 'none';
-            }
+            await fetchAndDisplayJobDetails(searchTerm);
         } else {
             statusElement.textContent = 'Vui lòng nhập job_id để tìm kiếm.';
         }
@@ -171,7 +165,7 @@
                 resultContainer.textContent = result.report;
                 resultContainer.style.display = 'block';
                 statusElement.textContent = 'Phân tích hoàn tất!';
-
+                await loadSearchHistorySummary(); // Tải lại lịch sử sau khi phân tích thành công
             } else {
                 throw new Error(result.detail || 'Lỗi không xác định từ server.');
             }
