@@ -11,19 +11,21 @@
 <div class="app-wrapper">
     <div class="history-sidebar">
         <div class="main-options">
-            <div class="option-item active">
+            <!-- Thêm data-target-url để xác định trang đích -->
+            <!-- Mặc định "AI Tra cứu sơ bộ" là active cho trang này -->
+            <div class="option-item active" data-target-url="{{ url_for('trangchu_id') }}">
                 <i class="fas fa-search"></i>
                 <span>AI Tra cứu sơ bộ</span>
             </div>
-            <div class="option-item">
+            <div class="option-item" data-target-url="{{ url_for('index_id') }}">
                 <i class="fas fa-book"></i>
                 <span>AI Tra cứu thông tin</span>
             </div>
-            <div class="option-item">
+            <div class="option-item" data-target-url="{{ url_for('audio_id') }}">
                 <i class="fas fa-phone-alt"></i>
                 <span>AI Phân tích cuộc g...</span>
             </div>
-            <div class="option-item">
+            <div class="option-item" data-target-url="{{ url_for('chatbot_id') }}">
                 <i class="fas fa-crosshairs"></i>
                 <span>AI Roleplay, xử lý tì...</span>
             </div>
@@ -75,7 +77,6 @@
 </div>
 
 <script>
-    // ... (Giữ nguyên JavaScript của bạn) ...
     const form = document.getElementById('upload-form');
     const fileInput = document.getElementById('audio-file');
     const fileLabel = document.getElementById('file-label');
@@ -88,12 +89,38 @@
     const searchButton = document.getElementById('search-button');
     const searchHistoryList = document.getElementById('search-history-list');
 
-    // Modal elements
     const deleteConfirmModal = document.getElementById('deleteConfirmModal');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
 
     let currentJobIdToDelete = null;
+
+    const optionItems = document.querySelectorAll('.option-item');
+
+    optionItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const targetUrl = item.getAttribute('data-target-url');
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            }
+        });
+    });
+
+    // Hàm để thiết lập trạng thái active dựa trên URL hiện tại
+    function setActiveOption() {
+        const currentPath = window.location.pathname;
+        optionItems.forEach(item => {
+            const targetUrl = item.getAttribute('data-target-url');
+            if (targetUrl && currentPath.includes(targetUrl)) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    // Gọi hàm khi tải trang
+    document.addEventListener('DOMContentLoaded', setActiveOption);
 
 
     async function loadSearchHistorySummary() {
@@ -147,7 +174,6 @@
         searchHistoryList.appendChild(listItem);
     }
 
-    // Hàm để xử lý xóa job
     async function handleDeleteJob(jobId) {
         statusElement.textContent = `Đang xóa job_id: ${jobId}...`;
         resultContainer.style.display = 'none';
@@ -198,7 +224,6 @@
         }
     }
 
-    // Tải lịch sử tóm tắt khi trang được tải
     document.addEventListener('DOMContentLoaded', loadSearchHistorySummary);
 
     fileInput.addEventListener('change', () => {
