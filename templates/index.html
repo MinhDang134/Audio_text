@@ -8,34 +8,42 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
 </head>
 <body>
-<div class="app-container">
-    <h1>MinhDang_chill</h1>
+<div class="app-wrapper">
+    <div class="history-sidebar">
+        <h2>Lịch sử tìm kiếm</h2>
+        <ul id="search-history-list" class="history-list">
+            </ul>
+    </div>
 
-    <form id="upload-form">
-        <label for="audio-file" id="file-label">
-            <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
-            <p>Kéo hoặc tải file vào đây</p>
-            <span id="file-name"></span>
-        </label>
-        <input type="file" name="audio_file" id="audio-file" accept="audio/*" required style="display:none;">
+    <div class="app-container">
+        <h1>MinhDang_chill</h1>
 
-        <div class="search-container">
-            <input type="text" id="search-input" placeholder="Tìm kiếm job_id...">
-            <button type="button" id="search-button"><i class="fas fa-search"></i></button>
-        </div>
+        <form id="upload-form">
+            <label for="audio-file" id="file-label">
+                <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
+                <p>Kéo hoặc tải file vào đây</p>
+                <span id="file-name"></span>
+            </label>
+            <input type="file" name="audio_file" id="audio-file" accept="audio/*" required style="display:none;">
 
-        <div class="model-selection">
-            <label for="ai-model">Chọn Mô hình AI:</label>
-            <select name="ai_model" id="ai-model">
-                <option value="model_a">Gemini 1.5</option>
-                <option value="model_b">Gemini 2.0 (Flash)</option>
-            </select>
-        </div>
-        <button type="submit" id="submit-btn">Phân tích</button>
-    </form>
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Tìm kiếm job_id...">
+                <button type="button" id="search-button"><i class="fas fa-search"></i></button>
+            </div>
 
-    <p id="status"></p>
-    <pre id="result-container" style="display:none;"></pre>
+            <div class="model-selection">
+                <label for="ai-model">Chọn Mô hình AI:</label>
+                <select name="ai_model" id="ai-model">
+                    <option value="model_a">Gemini 1.5</option>
+                    <option value="model_b">Gemini 2.0 (Flash)</option>
+                </select>
+            </div>
+            <button type="submit" id="submit-btn">Phân tích</button>
+        </form>
+
+        <p id="status"></p>
+        <pre id="result-container" style="display:none;"></pre>
+    </div>
 </div>
 
 <script>
@@ -49,7 +57,52 @@
     const aiModelSelect = document.getElementById('ai-model');
     const searchInput = document.getElementById('search-input');
     const searchButton = document.getElementById('search-button');
+    const searchHistoryList = document.getElementById('search-history-list');
 
+    // Hàm để tải lịch sử tìm kiếm từ Local Storage
+    function loadSearchHistory() {
+        const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        searchHistoryList.innerHTML = ''; // Xóa lịch sử hiện tại
+        history.forEach(item => {
+            addSearchHistoryItem(item, false); // Thêm từng mục vào danh sách
+        });
+    }
+
+    // Hàm để lưu lịch sử tìm kiếm vào Local Storage
+    function saveSearchHistory(item) {
+        const history = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        // Giới hạn số lượng mục trong lịch sử (ví dụ: 10 mục)
+        if (!history.includes(item)) { // Chỉ thêm nếu chưa có trong lịch sử
+            history.unshift(item); // Thêm vào đầu danh sách
+            if (history.length > 10) {
+                history.pop(); // Xóa mục cũ nhất nếu vượt quá giới hạn
+            }
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+            addSearchHistoryItem(item, true); // Thêm vào giao diện ngay lập tức
+        }
+    }
+
+    // Hàm để thêm một mục vào danh sách lịch sử tìm kiếm trên giao diện
+    function addSearchHistoryItem(item, prepend = true) {
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = '#';
+        link.textContent = item;
+        link.onclick = (e) => {
+            e.preventDefault();
+            searchInput.value = item;
+            searchButton.click();
+        };
+        listItem.appendChild(link);
+        if (prepend) {
+            searchHistoryList.prepend(listItem); // Thêm vào đầu danh sách
+        } else {
+            searchHistoryList.appendChild(listItem); // Thêm vào cuối danh sách (khi tải)
+        }
+    }
+
+    // Tải lịch sử khi trang được tải
+    document.addEventListener('DOMContentLoaded', loadSearchHistory);
 
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
@@ -68,14 +121,13 @@
 
             try {
                 const response = await fetch(`/status/${searchTerm}`);
-
                 const result = await response.json();
-
 
                 if (response.ok) {
                     resultContainer.textContent = JSON.stringify(result, null, 2);
                     resultContainer.style.display = 'block';
                     statusElement.textContent = `Tìm kiếm hoàn tất cho job_id: ${searchTerm}`;
+                    saveSearchHistory(searchTerm); // Lưu vào lịch sử sau khi tìm kiếm thành công
                 } else {
                     throw new Error(result.detail || 'Không tìm thấy hoặc có lỗi từ server.');
                 }
@@ -95,7 +147,6 @@
             searchButton.click();
         }
     });
-
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -120,6 +171,7 @@
                 resultContainer.textContent = result.report;
                 resultContainer.style.display = 'block';
                 statusElement.textContent = 'Phân tích hoàn tất!';
+
             } else {
                 throw new Error(result.detail || 'Lỗi không xác định từ server.');
             }

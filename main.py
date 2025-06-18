@@ -10,10 +10,27 @@ from dotenv import load_dotenv
 from sqlalchemy import select
 import uuid
 import json
+# {
+#   "conversation": [
+#     {
+#       "speaker": "Speaker 1",
+#       "timestamp": "HH:MM:SS",
+#       "utterance": "Câu nói của khách hàng."
+#     },
+#     {
+#       "speaker": "Speaker 2",
+#       "timestamp": "HH:MM:SS",
+#       "utterance": "Câu nói của nhân viên chăm sóc khách hàng."
+#     },
+#     // ... các câu nói khác
+#   ],
+#   "summary": "Tóm tắt cuộc hội thoại (nếu có yêu cầu thêm)",
+#   "sentiment": "Phân tích cảm xúc chung (nếu có yêu cầu thêm)"
+# }
 
 
 from audio.database import get_session, engine
-from audio.models import audiot
+from audio.models import audiot, history
 
 load_dotenv()
 app = FastAPI()
@@ -37,26 +54,6 @@ except Exception as e:
     model_hai = None
 
 prompt_instructions = """
-Bạn là một trợ lý phân tích cuộc gọi. Hãy phân tích cuộc hội thoại được cung cấp và trả về kết quả dưới dạng JSON theo cấu trúc sau:
-
-{
-  "conversation": [
-    {
-      "speaker": "Speaker 1",
-      "timestamp": "HH:MM:SS",
-      "utterance": "Câu nói của khách hàng."
-    },
-    {
-      "speaker": "Speaker 2",
-      "timestamp": "HH:MM:SS",
-      "utterance": "Câu nói của nhân viên chăm sóc khách hàng."
-    },
-    // ... các câu nói khác
-  ],
-  "summary": "Tóm tắt cuộc hội thoại (nếu có yêu cầu thêm)",
-  "sentiment": "Phân tích cảm xúc chung (nếu có yêu cầu thêm)"
-}
-
 *câu hỏi 1:* viết chi tiết toàn bộ cuộc hội thoại ra , chia ra người khách hàng là speaker 1 , còn nhân viên chăm sóc khách hàng là speaker 2 , phân tích chuẩn từng câu từng chữ nhất có thể , và hiển thị luôn thời gian đối tượng nói từng câu
 """
 
@@ -83,8 +80,7 @@ async def read_root(request: Request):
 
 
 @app.post("/analyze")
-async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(...),
-                        audio_file: UploadFile = File(...)):
+async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(...),audio_file: UploadFile = File(...)):
     if model is None:
         raise HTTPException(status_code=500, detail="Mô hình AI chưa được khởi tạo.")
     if not audio_file:
@@ -92,7 +88,7 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
     if not ai_model:
         raise HTTPException(status_code=500, detail="Chưa chọn mô hình AI.")
 
-    # Tạo job_id trực tiếp kiểu UUID
+
     job_id = uuid.uuid4()
     analysis_jobs[str(job_id)] = {"status": "PROCESSING", "report": None}
 
@@ -125,22 +121,6 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
             raise HTTPException(status_code=500, detail="Chương trình lỗi rồi ")
 
         report_text = response.text
-        # try:
-        #     # Cố gắng parse chuỗi report_text thành đối tượng JSON
-        #     report_data = json.loads(report_text)
-        #     # Nếu parse thành công, bạn có thể sử dụng report_data ở đây
-        #     # Ví dụ: report_data["conversation"]
-        #     # Để lưu vào DB hoặc gửi qua webhook, bạn có thể chuyển ngược lại thành chuỗi JSON
-        #     report_text = json.dumps(report_data, ensure_ascii=False, indent=2)  # Định dạng lại cho đẹp
-        # except json.JSONDecodeError as e:
-        #     print(f"[{job_id}] Lỗi khi phân tích JSON từ phản hồi của AI: {e}")
-        #     print(f"[{job_id}] Phản hồi gốc: {report_text[:500]}...")  # In ra một phần của phản hồi để debug
-        #     # Xử lý lỗi: có thể trả về lỗi hoặc lưu chuỗi gốc vào DB
-        #     report_text = report_text  # Giữ nguyên chuỗi gốc nếu không thể parse
-        #     analysis_jobs[str(job_id)]["status"] = "AI_REPORT_PARSE_FAILED"
-        #     analysis_jobs[str(job_id)]["error"] = f"AI response not valid JSON: {str(e)}"
-        #     # Bạn có thể muốn raise HTTPException ở đây hoặc có một cơ chế báo lỗi khác
-
 
         analysis_jobs[str(job_id)]["status"] = "Thành Công"
         analysis_jobs[str(job_id)]["report"] = report_text
@@ -155,7 +135,15 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
                     report=report_text,
                     model_ai=ai_model
                 )
+                analysis_result_history = history(
+                    job_id=job_id,
+                    status=analysis_jobs[str(job_id)]["status"],
+                    source_file=audio_file.filename,
+                    report=report_text,
+                    model_ai=ai_model
+                )
                 session.add(analysis_result)
+                session.add(analysis_result_history)
         except Exception as db_e:
             print(f"[{job_id}] Lỗi khi lưu vào cơ sở dữ liệu: {db_e}")
             analysis_jobs[str(job_id)]["status"] = "DB_SAVE_FAILED"
@@ -185,6 +173,7 @@ async def analyze_audio(background_tasks: BackgroundTasks, ai_model: str = Form(
                 report= " ",
                 model_ai=ai_model
             )
+
             session.add(analysis_result)
         raise HTTPException(status_code=500, detail=str(e))
     finally:

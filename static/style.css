@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 body {
     background-color: #1a1a2e;
     color: #e0e0e0;
@@ -5,23 +7,76 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
     min-height: 100vh;
-    padding: 20px;
     box-sizing: border-box;
+    padding: 20px;
+}
+
+.app-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+    max-width: 1200px;
+    margin: 0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.history-sidebar {
+    width: 250px;
+    background-color: #202030;
+    padding: 20px;
+    border-right: 1px solid #4a4a5c;
+    overflow-y: auto;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.history-sidebar h2 {
+    margin-top: 0;
+    font-size: 1.4em;
+    color: #8c7ae6;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-list li {
+    margin-bottom: 8px;
+}
+
+.history-list a {
+    text-decoration: none;
+    color: #e0e0e0;
+    display: block;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    background-color: #2a2a3e;
+}
+
+.history-list a:hover {
+    background-color: #35354a;
+    color: #a491f0;
 }
 
 .app-container {
-    width: 100%;
-    max-width: 700px;
-    background-color: #202030;
+    flex-grow: 1;
     padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background-color: #202030;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -48,7 +103,7 @@ form {
     padding: 40px;
     cursor: pointer;
     width: 80%;
-    max-width: 450px;
+    max-width: 700px;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -130,7 +185,6 @@ form {
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-
 #result-container::-webkit-scrollbar {
     width: 8px;
 }
@@ -149,31 +203,6 @@ form {
     background: #a491f0;
 }
 
-
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2.5em;
-    }
-
-    .app-container {
-        padding: 30px;
-        margin: 15px;
-    }
-
-    #file-label {
-        width: 90%;
-        padding: 30px;
-    }
-
-    #submit-btn {
-        padding: 12px 25px;
-        font-size: 1em;
-    }
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
-
 .model-selection {
     display: flex;
     flex-direction: column;
@@ -181,7 +210,8 @@ form {
     gap: 10px;
     margin-top: 15px;
     width: 80%;
-    max-width: 450px;
+    max-width: 700px;
+
 }
 
 .model-selection label {
@@ -219,18 +249,11 @@ form {
     box-shadow: 0 0 0 3px rgba(140, 122, 230, 0.3);
 }
 
-
-@media (max-width: 768px) {
-    .model-selection {
-        width: 90%;
-    }
-}
-
 .search-container {
     display: flex;
     margin: 20px auto;
     width: 100%;
-    max-width: 450px;
+    max-width: 700px;
     background-color: #2a2a3e;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
@@ -283,4 +306,77 @@ form {
 
 .search-container button i {
     margin: 0;
+}
+
+
+
+@media (max-width: 900px) {
+    .history-sidebar {
+        display: none;
+    }
+
+    .app-wrapper {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        justify-content: flex-start;
+        padding: 20px;
+    }
+
+    .app-container {
+        width: 100%;
+        max-width: none;
+        padding: 30px 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+
+    form {
+        gap: 20px;
+    }
+
+    #file-label {
+        width: 90%;
+        padding: 30px;
+        max-width: none;
+    }
+
+    #submit-btn {
+        padding: 12px 25px;
+        font-size: 1em;
+    }
+
+    .model-selection, .search-container {
+        width: 90%;
+        max-width: none;
+    }
+
+    #result-container {
+        width: 100%;
+        padding: 20px;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 500px) {
+    .app-container {
+        padding: 20px 15px;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    #file-label {
+        padding: 25px;
+    }
+    .search-container input[type="text"],
+    .search-container button {
+        padding: 10px 15px;
+        font-size: 0.95em;
+    }
 }

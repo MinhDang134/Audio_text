@@ -6,7 +6,7 @@
 # from fastapi import HTTPException
 #
 # def minhdangtext():
-#     job_id  = "7e9dc794-2642-4a17-8429-cb7ceb07454b"
+#     job_id  = "793f39df-1529-4acb-919d-f8c742dff9f6"
 #     try:
 #         minhdang_chill = get_job_status(job_id)
 #         if minhdang_chill:
