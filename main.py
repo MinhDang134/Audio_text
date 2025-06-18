@@ -235,3 +235,15 @@ def get_history_summary():
         history_list = [{"job_id": r.job_id, "source_file": r.source_file} for r in results]
         return history_list
 
+
+@app.delete("/delete/{job_id}")
+def delete_job(job_id: str):
+    with get_session() as session:
+        history_to_delete = session.query(history).filter(history.job_id == job_id).first()
+        if history_to_delete:
+            session.delete(history_to_delete)
+            session.commit()
+            print(f"Xóa thành công {job_id}")
+            return {"message": f"Job {job_id} đã được xóa thành công."}
+        else:
+            raise HTTPException(status_code=404, detail=f"Không tìm thấy job_id: {job_id} để xóa.")
