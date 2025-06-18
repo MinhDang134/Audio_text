@@ -350,9 +350,9 @@ form {
     margin: 0;
 }
 
-
+/* Modal Styles */
 .modal {
-    display: none;
+    display: none; /* Đã sửa: Ban đầu ẩn modal */
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -361,7 +361,7 @@ form {
     height: 100%;
     overflow: auto;
     background-color: rgba(0,0,0,0.6);
-    display: flex;
+    /* display: flex; <--- Bỏ dòng này ở đây. Sẽ được set bằng JS khi cần hiển thị */
     align-items: center;
     justify-content: center;
 }
