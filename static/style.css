@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 body {
     background-color: #1a1a2e;
     color: #e0e0e0;
@@ -5,23 +7,167 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Changed to flex-start for better top alignment */
     min-height: 100vh;
-    padding: 20px;
     box-sizing: border-box;
+    padding: 20px;
 }
 
-.app-container {
+.app-wrapper {
+    display: flex;
     width: 100%;
-    max-width: 700px;
-    background-color: #202030;
-    padding: 40px;
+    height: 100vh;
+    box-sizing: border-box;
+    max-width: 1200px;
+    margin: 0;
     border-radius: 15px;
+    overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    background-color: #202030; /* Added a background color for the wrapper */
+}
+
+.history-sidebar {
+    width: 280px; /* Tăng chiều rộng để nội dung dễ đọc hơn */
+    background-color: #1a1a2e; /* Nền tối hơn để tạo sự tương phản */
+    padding: 30px 20px; /* Tăng padding */
+    border-right: 1px solid #3a3a4a; /* Đường viền nhẹ nhàng hơn */
+    overflow-y: auto;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    position: relative; /* Thêm để đặt scrollbar */
+}
+
+.history-sidebar h2 {
+    margin-top: 0;
+    font-size: 1.6em; /* Cỡ chữ lớn hơn */
+    color: #8c7ae6;
+    margin-bottom: 25px; /* Khoảng cách dưới lớn hơn */
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px; /* Tăng padding */
+    border-radius: 10px; /* Bo tròn nhiều hơn */
+    margin-bottom: 10px; /* Khoảng cách giữa các mục */
+    background-color: #2a2a3e; /* Nền của từng mục */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ nhàng */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative; /* Để sử dụng pseudo-elements cho hiệu ứng */
+    overflow: hidden; /* Đảm bảo các hiệu ứng không tràn ra ngoài */
+}
+
+.history-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px; /* Đường viền màu ở bên trái */
+    height: 100%;
+    background-color: #8c7ae6; /* Màu chủ đạo */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+}
+
+.history-item:hover {
+    background-color: #35354a;
+    transform: translateY(-3px); /* Nhấc lên nhẹ khi hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.history-item:hover::before {
+    transform: translateX(0); /* Hiển thị đường viền màu */
+}
+
+.history-item a {
+    flex-grow: 1;
+    margin-right: 10px; /* Khoảng cách giữa text và nút xóa */
+    color: #e0e0e0;
+    text-decoration: none;
+    display: block;
+    font-size: 0.95em; /* Kích thước chữ nhỏ hơn một chút */
+    line-height: 1.4; /* Tăng line-height cho dễ đọc */
+    word-break: break-all;
+    transition: color 0.2s ease;
+    padding-right: 10px; /* Tránh text chạm vào nút xóa */
+}
+
+.history-item a strong {
+    color: #a491f0; /* Màu nổi bật cho job_id */
+    font-weight: 600;
+    display: block; /* Đảm bảo job_id xuống dòng */
+    margin-bottom: 2px;
+}
+
+.history-item a:hover {
+    color: #b0b0b0; /* Màu chữ hơi mờ đi khi hover */
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 0.9em; /* Kích thước icon nhỏ hơn */
+    padding: 8px; /* Giảm padding */
+    border-radius: 50%; /* Làm tròn nút */
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 35px; /* Đảm bảo kích thước cố định */
+    height: 35px; /* Đảm bảo kích thước cố định */
+}
+
+.delete-btn:hover {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #ff6b81; /* Màu đỏ sáng hơn khi hover */
+}
+.delete-btn:active {
+    transform: translateY(1px);
+}
+
+/* Scrollbar styling for history sidebar */
+.history-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-sidebar::-webkit-scrollbar-track {
+    background: #1a1a2e; /* Nền của thanh cuộn */
+    border-radius: 10px;
+}
+
+.history-sidebar::-webkit-scrollbar-thumb {
+    background: #4a4a5c; /* Màu của "cục" cuộn */
+    border-radius: 10px;
+}
+
+.history-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #6c757d; /* Màu khi hover vào "cục" cuộn */
+}
+
+
+.app-container {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #202030;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    box-sizing: border-box;
 }
 
 h1 {
@@ -48,7 +194,7 @@ form {
     padding: 40px;
     cursor: pointer;
     width: 80%;
-    max-width: 450px;
+    max-width: 700px;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -130,7 +276,6 @@ form {
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-
 #result-container::-webkit-scrollbar {
     width: 8px;
 }
@@ -149,31 +294,6 @@ form {
     background: #a491f0;
 }
 
-
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2.5em;
-    }
-
-    .app-container {
-        padding: 30px;
-        margin: 15px;
-    }
-
-    #file-label {
-        width: 90%;
-        padding: 30px;
-    }
-
-    #submit-btn {
-        padding: 12px 25px;
-        font-size: 1em;
-    }
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-
-
 .model-selection {
     display: flex;
     flex-direction: column;
@@ -181,7 +301,8 @@ form {
     gap: 10px;
     margin-top: 15px;
     width: 80%;
-    max-width: 450px;
+    max-width: 700px;
+
 }
 
 .model-selection label {
@@ -219,18 +340,11 @@ form {
     box-shadow: 0 0 0 3px rgba(140, 122, 230, 0.3);
 }
 
-
-@media (max-width: 768px) {
-    .model-selection {
-        width: 90%;
-    }
-}
-
 .search-container {
     display: flex;
     margin: 20px auto;
     width: 100%;
-    max-width: 450px;
+    max-width: 700px;
     background-color: #2a2a3e;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     border-radius: 12px;
@@ -283,4 +397,158 @@ form {
 
 .search-container button i {
     margin: 0;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; /* Đã sửa: Ban đầu ẩn modal */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    /* display: flex; <--- Bỏ dòng này ở đây. Sẽ được set bằng JS khi cần hiển thị */
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #2a2a3e;
+    margin: auto;
+    padding: 30px;
+    border: 1px solid #4a4a5c;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    text-align: center;
+    color: #e0e0e0;
+}
+
+.modal-content p {
+    font-size: 1.1em;
+    margin-bottom: 25px;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-buttons button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.modal-buttons .confirm-btn {
+    background-color: #dc3545;
+    color: white;
+}
+.modal-buttons .confirm-btn:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+}
+.modal-buttons .confirm-btn:active {
+    transform: translateY(0);
+}
+
+.modal-buttons .cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+.modal-buttons .cancel-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+.modal-buttons .cancel-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+    .history-sidebar {
+        display: none;
+    }
+
+    .app-wrapper {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        justify-content: flex-start;
+        padding: 20px;
+    }
+
+    .app-container {
+        width: 100%;
+        max-width: none;
+        padding: 30px 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+
+    form {
+        gap: 20px;
+    }
+
+    #file-label {
+        width: 90%;
+        padding: 30px;
+        max-width: none;
+    }
+
+    #submit-btn {
+        padding: 12px 25px;
+        font-size: 1em;
+    }
+
+    .model-selection, .search-container {
+        width: 90%;
+        max-width: none;
+    }
+
+    #result-container {
+        width: 100%;
+        padding: 20px;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 500px) {
+    .app-container {
+        padding: 20px 15px;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    #file-label {
+        padding: 25px;
+    }
+    .search-container input[type="text"],
+    .search-container button {
+        padding: 10px 15px;
+        font-size: 0.95em;
+    }
+
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+    .modal-buttons button {
+        padding: 10px 20px;
+    }
 }

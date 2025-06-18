@@ -1,14 +1,10 @@
-# import asyncio
-#
-# import uvicorn
-#
-# from main import get_job_status
+# from main import get_job_status,delete_job
 # from fastapi import HTTPException
 #
 # def minhdangtext():
-#     job_id  = "7e9dc794-2642-4a17-8429-cb7ceb07454b"
+#     job_id  = "aa06fb97-eafd-4987-8754-2769353663d8"
 #     try:
-#         minhdang_chill = get_job_status(job_id)
+#         minhdang_chill = delete_job(job_id)
 #         if minhdang_chill:
 #             print(f"Co du lieu la{minhdang_chill}")
 #     except Exception as e:
