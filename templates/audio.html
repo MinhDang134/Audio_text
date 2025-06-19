@@ -38,15 +38,6 @@
     <pre id="result-container" style="display:none;"></pre>
 </div>
 
-{#<div id="deleteConfirmModal" class="modal">#}
-{#    <div class="modal-content">#}
-{#        <p>Bạn có chắc chắn muốn xóa mục này không?</p>#}
-{#        <div class="modal-buttons">#}
-{#            <button class="confirm-btn" id="confirmDeleteBtn">Xóa</button>#}
-{#            <button class="cancel-btn" id="cancelDeleteBtn">Hủy</button>#}
-{#        </div>#}
-{#    </div>#}
-{#</div>#}
 
 <script>
     const form = document.getElementById('upload-form');
@@ -163,7 +154,6 @@
                 resultContainer.textContent = JSON.stringify(result, null, 2);
                 resultContainer.style.display = 'block';
                 statusElement.textContent = 'Phân tích hoàn tất!';
-                // loadSearchHistorySummary(); // Hàm này không còn ở đây nữa
             } else {
                 throw new Error(result.detail || 'Lỗi không xác định từ server.');
             }
@@ -174,11 +164,6 @@
             submitBtn.disabled = false;
         }
     });
-
-
-
-
-
 
     document.addEventListener('DOMContentLoaded', async () => {
         const urlParams = new URLSearchParams(window.location.search);
