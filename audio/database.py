@@ -4,7 +4,8 @@ from contextlib import contextmanager
 from typing import Generator, Optional
 from dotenv import load_dotenv
 from sqlalchemy.engine import Engine
-from sqlmodel import create_engine, Session
+from sqlmodel import create_engine, Session, SQLModel
+
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -17,6 +18,9 @@ if not DATABASE_URL:
 
 engine: Engine = create_engine(DATABASE_URL)
 
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+    print("Đã tạo tất cả các bảng trong cơ sở dữ liệu.")
 
 @contextmanager
 def get_session(engine_to_use: Optional[Engine] = None) -> Generator[Session, None, None]:

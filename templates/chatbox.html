@@ -8,29 +8,132 @@
     <link rel="stylesheet" href="{{ url_for('static', path='chatbox.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="chatbox-container">
-        <div class="welcome-message">
-            <h1>Xin chào <span class="gradient-text">MinhDangPY134!</span></h1>
+        <div class="welcome-message-wrapper">
+            <div class="welcome-message">
+                <h1>Xin chào <span class="gradient-text">MinhDangPY134!</span></h1>
+                <p class="subtitle">Hãy để tôi giúp bạn khám phá thế giới.</p>
+            </div>
         </div>
 
-        <div class="chat-input-area">
-            <div class="chat-input-wrapper">
-                <button class="icon-button plus-button"><i class="fas fa-plus"></i></button>
-                <input type="text" placeholder="Hỏi Gemini" class="chat-input-field">
-                <div class="bottom-options">
-                    <button class="option-button">
-                        <i class="fas fa-search"></i> Deep Research
-                    </button>
-                    <button class="option-button">
-                        <i class="fas fa-brush"></i> Canvas
-                    </button>
+        <div class="chat-area">
+            <div class="chat-display-area" id="chat-display-area">
+                <div class="initial-bot-message chat-message bot-message">
+                    <span class="sender">Gemini:</span>
+                    <span class="text">Chào bạn! Tôi có thể giúp gì cho bạn hôm nay?</span>
                 </div>
-                <button class="icon-button microphone-button"><i class="fas fa-microphone"></i></button>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="chat-input-wrapper">
+                    <button class="icon-button plus-button" title="Thêm tệp đính kèm"><i class="fas fa-plus"></i></button>
+                    <input type="text" placeholder="Hỏi Gemini" class="chat-input-field" id="user-input" aria-label="Nhập tin nhắn của bạn">
+                    <div class="bottom-options">
+                        <button class="option-button" title="Tìm kiếm chuyên sâu">
+                            <i class="fas fa-search"></i> Deep Research
+                        </button>
+                        <button class="option-button" title="Tạo hình ảnh">
+                            <i class="fas fa-brush"></i> Canvas
+                        </button>
+                    </div>
+                    <button class="icon-button send-button" id="send-button" title="Gửi tin nhắn"><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
     </div>
+
+    <script>
+        const chatInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const chatDisplayArea = document.getElementById('chat-display-area');
+
+
+        let currentSessionId = localStorage.getItem('chatSessionId');
+        if (!currentSessionId) {
+            currentSessionId = 'session_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('chatSessionId', currentSessionId);
+        }
+
+
+        function addMessageToChat(sender, message, isBot = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message');
+            messageDiv.classList.add(isBot ? 'bot-message' : 'user-message');
+
+            const senderSpan = document.createElement('span');
+            senderSpan.classList.add('sender');
+            senderSpan.textContent = sender + ': ';
+
+            const messageTextSpan = document.createElement('span');
+            messageTextSpan.classList.add('text');
+            messageTextSpan.textContent = message;
+
+            messageDiv.appendChild(senderSpan);
+            messageDiv.appendChild(messageTextSpan);
+            chatDisplayArea.appendChild(messageDiv);
+
+
+            chatDisplayArea.scrollTop = chatDisplayArea.scrollHeight;
+        }
+
+        // Hàm gửi tin nhắn đến backend
+        async function sendMessage() {
+            const userInput = chatInput.value.trim();
+            if (!userInput) return;
+
+            addMessageToChat('Bạn', userInput);
+            chatInput.value = '';
+
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('bot-message', 'typing-indicator');
+            typingIndicator.innerHTML = '<span class="sender">Bot:</span> <span class="text">Đang gõ...</span>';
+            chatDisplayArea.appendChild(typingIndicator);
+            chatDisplayArea.scrollTop = chatDisplayArea.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userInput, session_id: currentSessionId }),
+                });
+
+                const data = await response.json();
+                typingIndicator.remove();
+
+                if (response.ok) {
+                    addMessageToChat('Gemini', data.response, true);
+                    if (data.session_id) {
+                        currentSessionId = data.session_id;
+                        localStorage.setItem('chatSessionId', currentSessionId);
+                    }
+                } else {
+                    addMessageToChat('Lỗi', data.detail || 'Có lỗi xảy ra khi trò chuyện.', true);
+                    console.error('Error from backend:', data);
+                }
+            } catch (error) {
+                typingIndicator.remove();
+                addMessageToChat('Lỗi kết nối', 'Không thể kết nối đến server.', true);
+                console.error('Fetch error:', error);
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        window.onload = () => {
+
+        };
+    </script>
 </body>
 </html>
